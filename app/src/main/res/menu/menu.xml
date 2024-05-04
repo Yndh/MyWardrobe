@@ -17,7 +17,7 @@
 
     <item
         android:id="@+id/action_wardrobe"
-        android:icon="@drawable/round_person_48"
+        android:icon="@drawable/baseline_checkroom_24"
         android:title=""
         app:showAsAction="ifRoom"
         />

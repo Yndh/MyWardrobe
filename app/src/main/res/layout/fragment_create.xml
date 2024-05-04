@@ -6,14 +6,78 @@
     tools:context=".CreateFragment"
     android:background="@color/background"
     android:orientation="vertical"
-    android:gravity="center"
+    android:padding="25dp"
     >
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Create"
+        android:text="Create Outfit"
         android:textSize="24sp"
+        android:textColor="@color/font"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp"
         />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="end"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@drawable/tylertee"
+                android:scaleType="fitCenter"
+                android:layout_gravity="center"
+                />
+            <ImageView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@drawable/jinco"
+                android:scaleType="fitCenter"
+                android:layout_gravity="center"
+                />
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/timbs"
+                android:scaleType="fitCenter"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/baseline_casino_24"
+                android:padding="12dp"
+                android:background="@drawable/rounded_border"
+                android:layout_marginBottom="10dp"
+                />
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/baseline_favorite_24"
+                android:padding="12dp"
+                android:background="@drawable/rounded_border"
+                android:layout_marginBottom="10dp"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>
