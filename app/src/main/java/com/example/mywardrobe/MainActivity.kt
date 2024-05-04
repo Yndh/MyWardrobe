@@ -1,16 +1,14 @@
 package com.example.mywardrobe
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.android.material.appbar.MaterialToolbar
+import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.navigation.NavigationView
+
 
 class MainActivity : AppCompatActivity() {
     lateinit var navigation: BottomNavigationView
@@ -26,23 +24,42 @@ class MainActivity : AppCompatActivity() {
         }
 
         navigation = findViewById(R.id.navigationView)
+
         navigation.setOnItemSelectedListener { menuItem ->
             when(menuItem.itemId) {
                 R.id.action_home -> {
-                    Toast.makeText(this@MainActivity, "Home", Toast.LENGTH_LONG ).show()
+                    replaceFragment(HomeFragment())
                     true
                 }
                 R.id.action_create -> {
-                    Toast.makeText(this@MainActivity, "Create", Toast.LENGTH_LONG ).show()
+                    replaceFragment(CreateFragment())
                     true
                 }
                 R.id.action_wardrobe -> {
-                    Toast.makeText(this@MainActivity, "Wardrobe", Toast.LENGTH_LONG ).show()
+                    replaceFragment(WardrobeFragment())
                     true
                 }
                 else -> false
             }
         }
+
+        if(savedInstanceState==null){
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentFrame, HomeFragment())
+                .commit()
+        }
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+//        fragmentTransaction.setCustomAnimations(
+//            R.anim.slide_in,
+//            R.anim.slide_out
+//        )
+
+        fragmentTransaction
+            .replace(R.id.fragmentFrame, fragment)
+            .commit()
     }
 
 
