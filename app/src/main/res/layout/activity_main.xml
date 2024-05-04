@@ -39,7 +39,7 @@
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/navigationView"
             android:layout_width="290dp"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             app:menu="@menu/menu"
             android:layout_gravity="center"
             app:itemIconSize="38dp"
