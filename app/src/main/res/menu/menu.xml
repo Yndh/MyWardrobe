@@ -10,7 +10,7 @@
 
     <item
         android:id="@+id/action_create"
-        android:icon="@drawable/round_add_box_24"
+        android:icon="@drawable/baseline_casino_24"
         android:title=""
         app:showAsAction="ifRoom"
         />
