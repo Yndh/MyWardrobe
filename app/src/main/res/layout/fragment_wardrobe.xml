@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".WardrobeFragment"
-    android:background="@color/background"
+    android:background="@android:color/transparent"
     android:orientation="vertical"
     android:padding="25dp"
     >
@@ -446,6 +446,7 @@
 
 
     <ImageButton
+        android:id="@+id/addNewClothingButton"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:background="@drawable/rounded_border"
