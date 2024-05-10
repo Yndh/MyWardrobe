@@ -1,6 +1,8 @@
 package com.example.mywardrobe
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -11,7 +13,7 @@ import java.io.FileNotFoundException
 import java.io.InputStreamReader
 
 data class ClothingItem(
-    val image: ByteArray,
+    val imageName: String,
     val name: String,
     val tags: List<String>
 )
@@ -25,6 +27,16 @@ object ClothingItemsManager {
 
     fun getClothingItems(): List<ClothingItem>{
         return clothingItems.toList()
+    }
+
+    fun getImage(context: Context, fileName: String): Bitmap? {
+        val file = File(context.filesDir, fileName)
+        return if (file.exists()) {
+            BitmapFactory.decodeFile(file.absolutePath)
+        } else {
+            Log.e("ClothingItemManager", "Image not found: $fileName")
+            null
+        }
     }
 
     fun loadClothingItems(context: Context){

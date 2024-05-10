@@ -70,6 +70,72 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Item Type"
+        android:textSize="16sp"
+        android:textColor="@color/font"
+        android:layout_marginBottom="5dp"
+        />
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginBottom="25dp"
+        android:scrollbars="none"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Headwear"
+                android:textSize="16sp"
+                android:textColor="@color/font"
+                android:background="@drawable/rounded_border"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:layout_marginRight="5dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tops"
+                android:textSize="16sp"
+                android:textColor="@color/font"
+                android:background="@drawable/rounded_border"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:layout_marginRight="5dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bottoms"
+                android:textSize="16sp"
+                android:textColor="@color/font"
+                android:background="@drawable/rounded_border"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:layout_marginRight="5dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Footwear"
+                android:textSize="16sp"
+                android:textColor="@color/font"
+                android:background="@drawable/rounded_border"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:layout_marginRight="5dp"
+                />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="Tags"
         android:textSize="16sp"
         android:textColor="@color/font"

@@ -65,7 +65,7 @@ class WardrobeFragment : Fragment() {
                 230,
                 230
             )
-            imageView.setImageBitmap(byteArrayToBitmap(item.image))
+            imageView.setImageBitmap(ClothingItemsManager.getImage(requireContext(), item.imageName))
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
 
             val innerLinearLayout = LinearLayout(requireContext())
@@ -78,10 +78,11 @@ class WardrobeFragment : Fragment() {
 
 
             val itemNameTextView = TextView(requireContext())
-            itemNameTextView.layoutParams = LinearLayout.LayoutParams(
+            val itemNameLayoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            )
+            ).also { itemNameTextView.layoutParams = it }
+            itemNameLayoutParams.setMargins(0, 0, 0, 10)
             itemNameTextView.textSize = 20f
             itemNameTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
             itemNameTextView.text = item.name

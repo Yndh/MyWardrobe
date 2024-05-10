@@ -110,9 +110,10 @@ class NewClothingFragment : Fragment() {
         }
 
         val imageByteArray = convertImageToByteArray(requireContext(), pickedImageUri)
+        val imageName = "${System.currentTimeMillis()}.png"
 
         val newClothingItem = ClothingItem(
-            image = imageByteArray ?: byteArrayOf(),
+            imageName = imageName,
             name = title,
             tags = tags
         )
@@ -128,8 +129,15 @@ class NewClothingFragment : Fragment() {
         val clothingItemList = ClothingItemsManager.getClothingItems()
 
         GlobalScope.launch(Dispatchers.Main) {
-            val result = saveClothingItems(requireContext(), clothingItemList)
-            if(result){
+            val imageResult = saveImage(requireContext(), imageName, imageByteArray)
+            if(imageResult){
+                Log.d("NewClothingFragment", "Image file saved")
+            } else {
+                Toast.makeText(requireContext(), "Failed to save image", Toast.LENGTH_SHORT).show()
+            }
+
+            val dataResult = saveClothingItems(requireContext(), clothingItemList)
+            if(dataResult){
                 Log.d("NewClothingFragment", "Clothing item file saved")
             } else {
                 Toast.makeText(requireContext(), "Failed to save item", Toast.LENGTH_SHORT).show()
@@ -145,6 +153,22 @@ class NewClothingFragment : Fragment() {
                 fileOutputStream.write(jsonString.toByteArray())
                 fileOutputStream.close()
                 true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
+    }
+
+    private suspend fun saveImage(context: Context, fileName: String, data: ByteArray?): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                data?.let {
+                    val fileOutputStream = context.openFileOutput(fileName, Context.MODE_PRIVATE)
+                    fileOutputStream.write(data)
+                    fileOutputStream.close()
+                    true
+                } ?: false
             } catch (e: Exception) {
                 e.printStackTrace()
                 false
