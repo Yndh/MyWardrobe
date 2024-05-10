@@ -24,6 +24,8 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        ClothingItemsManager.loadClothingItems(applicationContext)
+
         navigation = findViewById(R.id.navigationView)
 
         navigation.setOnItemSelectedListener { menuItem ->
