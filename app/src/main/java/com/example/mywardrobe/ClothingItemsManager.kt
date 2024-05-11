@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
@@ -43,7 +45,7 @@ object ClothingItemsManager {
     fun loadClothingItems(context: Context){
         val dataFile = File(context.filesDir, "data.json")
         if(!dataFile.exists()){
-            Log.d("ClothingItemManager", "Data.json doesn't exist. Creating...")
+            Log.d("ClothingItemManager", "data.json doesn't exist. Creating...")
         }
 
         try {
@@ -60,6 +62,37 @@ object ClothingItemsManager {
             Log.e("ClothingItemsManager", "File not found: ${e.message}")
         } catch (e: Exception) {
             Log.e("ClothingItemsManager", "Error loading data: ${e.message}")
+        }
+    }
+
+    suspend fun saveClothingItems(context: Context, items: List<ClothingItem>): Boolean {
+        return withContext(Dispatchers.IO){
+            try {
+                val jsonString = Gson().toJson(items)
+                val fileOutputStream = context.openFileOutput("data.json", Context.MODE_PRIVATE)
+                fileOutputStream.write(jsonString.toByteArray())
+                fileOutputStream.close()
+                true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
+    }
+
+    suspend fun saveImage(context: Context, fileName: String, data: ByteArray?): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                data?.let {
+                    val fileOutputStream = context.openFileOutput(fileName, Context.MODE_PRIVATE)
+                    fileOutputStream.write(data)
+                    fileOutputStream.close()
+                    true
+                } ?: false
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
         }
     }
 }

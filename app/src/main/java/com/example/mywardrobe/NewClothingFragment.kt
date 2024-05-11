@@ -87,7 +87,7 @@ class NewClothingFragment : Fragment() {
         }
     }
 
-    private fun displayTagsAndTypes(types: Array<String>){
+    private fun displayTagsAndTypes(types: List<String>){
         val inflater = LayoutInflater.from(requireContext())
 
         for(type in types){
@@ -141,7 +141,6 @@ class NewClothingFragment : Fragment() {
         val title = titleEditText.text.toString()
         val tags = listOf("test")
         val checkedRadio = itemTypeRadioGroup.checkedRadioButtonId
-        Toast.makeText(requireContext(), "$checkedRadio", Toast.LENGTH_SHORT).show()
 
         if(!::pickedImageUri.isInitialized){
             Toast.makeText(requireContext(), "Please select an image", Toast.LENGTH_SHORT).show()
@@ -177,14 +176,14 @@ class NewClothingFragment : Fragment() {
         val clothingItemList = ClothingItemsManager.getClothingItems()
 
         GlobalScope.launch(Dispatchers.Main) {
-            val imageResult = saveImage(requireContext(), imageName, imageByteArray)
+            val imageResult = ClothingItemsManager.saveImage(requireContext(), imageName, imageByteArray)
             if(imageResult){
                 Log.d("NewClothingFragment", "Image file saved")
             } else {
                 Toast.makeText(requireContext(), "Failed to save image", Toast.LENGTH_SHORT).show()
             }
 
-            val dataResult = saveClothingItems(requireContext(), clothingItemList)
+            val dataResult = ClothingItemsManager.saveClothingItems(requireContext(), clothingItemList)
             if(dataResult){
                 Log.d("NewClothingFragment", "Clothing item file saved")
             } else {
@@ -192,36 +191,4 @@ class NewClothingFragment : Fragment() {
             }
         }
     }
-
-    private suspend fun saveClothingItems(context: Context, items: List<ClothingItem>): Boolean {
-        return withContext(Dispatchers.IO){
-            try {
-                val jsonString = Gson().toJson(items)
-                val fileOutputStream = context.openFileOutput("data.json", Context.MODE_PRIVATE)
-                fileOutputStream.write(jsonString.toByteArray())
-                fileOutputStream.close()
-                true
-            } catch (e: Exception) {
-                e.printStackTrace()
-                false
-            }
-        }
-    }
-
-    private suspend fun saveImage(context: Context, fileName: String, data: ByteArray?): Boolean {
-        return withContext(Dispatchers.IO) {
-            try {
-                data?.let {
-                    val fileOutputStream = context.openFileOutput(fileName, Context.MODE_PRIVATE)
-                    fileOutputStream.write(data)
-                    fileOutputStream.close()
-                    true
-                } ?: false
-            } catch (e: Exception) {
-                e.printStackTrace()
-                false
-            }
-        }
-    }
-
 }

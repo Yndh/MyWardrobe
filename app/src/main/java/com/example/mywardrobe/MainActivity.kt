@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         ClothingItemsManager.loadClothingItems(applicationContext)
+        ClothingTagsManager.loadClothingTags(applicationContext)
 
         navigation = findViewById(R.id.navigationView)
 

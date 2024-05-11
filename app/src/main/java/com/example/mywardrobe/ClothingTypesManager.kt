@@ -1,9 +1,9 @@
 package com.example.mywardrobe
 
 object ClothingTypesManager {
-    private val itemTypes = arrayOf("Headwear", "Tops", "Bottoms", "Footwear")
+    private val itemTypes = mutableListOf("Headwear", "Tops", "Bottoms", "Footwear")
 
-    fun getTypes(): Array<String>{
+    fun getTypes(): List<String>{
         return itemTypes
     }
     fun getTypeName(index: Int): String{

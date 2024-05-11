@@ -2,14 +2,18 @@ package com.example.mywardrobe
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Typeface
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.RadioButton
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.marginRight
@@ -20,6 +24,7 @@ class WardrobeFragment : Fragment() {
 
     private lateinit var newClothingButton: ImageButton
     private lateinit var wardobeLinearLayout: LinearLayout
+    private lateinit var tagsAndTypesLinearLayout: LinearLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,18 +39,81 @@ class WardrobeFragment : Fragment() {
 
         newClothingButton = view.findViewById(R.id.addNewClothingButton)
         wardobeLinearLayout = view.findViewById(R.id.wardobeLinearLayout)
+        tagsAndTypesLinearLayout = view.findViewById(R.id.tagsAndTypesLinearLayout)
 
         newClothingButton.setOnClickListener {
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentFrame, NewClothingFragment())
                 .addToBackStack(null)
                 .commit()
-
-
         }
 
         val clothingItems = ClothingItemsManager.getClothingItems()
         displayClothingItems(clothingItems)
+        val clothingTypes = ClothingTypesManager.getTypes()
+        val clothingTags = ClothingTagsManager.getTags()
+        displayTypesAndTags(clothingTypes, clothingTags)
+    }
+
+    fun displayTypesAndTags(types: List<String>, tags: List<Tag>){
+        val inflater = LayoutInflater.from(requireContext())
+
+        for(type in types){
+            val checkbox = CheckBox(requireContext())
+            val checkboxLayoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                90
+            ).also { checkbox.layoutParams = it }
+            checkboxLayoutParams.setMargins(0, 0, 20, 0)
+            checkbox.setPadding(25, 15, 25, 15)
+            checkbox.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
+            checkbox.background = ContextCompat.getDrawable(requireContext(), R.drawable.radio_border)
+            checkbox.buttonDrawable = null
+            checkbox.text = type.toString()
+            checkbox.textSize = 14f
+
+            tagsAndTypesLinearLayout.addView(checkbox)
+        }
+
+        for(tag in tags){
+            val checkbox = CheckBox(requireContext())
+            val checkboxLayoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                90
+            ).also { checkbox.layoutParams = it }
+            checkboxLayoutParams.setMargins(0, 0, 20, 0)
+            checkbox.setPadding(25, 15, 25, 15)
+            checkbox.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
+            checkbox.background = ContextCompat.getDrawable(requireContext(), R.drawable.radio_border)
+            checkbox.buttonDrawable = null
+            checkbox.text = tag.name.toString()
+            checkbox.textSize = 14f
+
+            tagsAndTypesLinearLayout.addView(checkbox)
+        }
+
+        val button = Button(requireContext())
+        val buttonLayoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            90
+        ).also { button.layoutParams = it }
+        buttonLayoutParams.setMargins(10, 0, 20, 0)
+        button.setPadding(25, 15, 25, 15)
+        button.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
+        button.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_border)
+        button.text = "Create New Tag"
+        button.isAllCaps = false
+        button.textSize = 14f
+        button.setTypeface(null, Typeface.BOLD)
+        button.setOnClickListener {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentFrame, NewClothingTagFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        tagsAndTypesLinearLayout.addView(button)
+
     }
 
     fun displayClothingItems(clothingItems: List<ClothingItem>){
