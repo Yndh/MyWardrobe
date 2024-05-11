@@ -18,8 +18,8 @@ import androidx.core.view.setPadding
 
 class WardrobeFragment : Fragment() {
 
-    lateinit var newClothingButton: ImageButton
-    lateinit var wardobeLinearLayout: LinearLayout
+    private lateinit var newClothingButton: ImageButton
+    private lateinit var wardobeLinearLayout: LinearLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -93,6 +93,19 @@ class WardrobeFragment : Fragment() {
                 LinearLayout.LayoutParams.MATCH_PARENT
             )
             tagLinearLayout.orientation = LinearLayout.HORIZONTAL
+
+            val itemTypeTextView = TextView(requireContext())
+            val itemTypeParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).also { itemTypeTextView.layoutParams = it }
+            itemTypeParams.setMargins(0, 0, 20, 0)
+            itemTypeTextView.textSize = 16f
+            itemTypeTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
+            itemTypeTextView.text = ClothingTypesManager.getTypeName(item.type.toInt())
+            itemTypeTextView.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_border)
+            itemTypeTextView.setPadding(20, 10, 20, 10)
+            tagLinearLayout.addView(itemTypeTextView)
 
             for(tag in item.tags){
                 val itemTagTextView = TextView(requireContext())

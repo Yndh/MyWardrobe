@@ -15,6 +15,7 @@ import java.io.InputStreamReader
 data class ClothingItem(
     val imageName: String,
     val name: String,
+    val type: Number,
     val tags: List<String>
 )
 

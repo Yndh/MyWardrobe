@@ -19,6 +19,10 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.setPadding
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.widget.LinearLayout
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -35,6 +39,8 @@ class NewClothingFragment : Fragment() {
     private lateinit var titleEditText: EditText
     private lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
     private lateinit var pickedImageUri: Uri
+    private lateinit var goBackImageButton: ImageButton
+    private lateinit var itemTypeRadioGroup: RadioGroup
 
 
     override fun onCreateView(
@@ -51,6 +57,10 @@ class NewClothingFragment : Fragment() {
         addImageButton = view.findViewById(R.id.addImageButton)
         addClothingButton = view.findViewById(R.id.addClothingButton)
         titleEditText = view.findViewById(R.id.titleEditText)
+        goBackImageButton = view.findViewById(R.id.goBackImageButton)
+        itemTypeRadioGroup = view.findViewById(R.id.itemTypeRadioGroup)
+
+        displayTagsAndTypes(ClothingTypesManager.getTypes())
 
         pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
@@ -71,6 +81,37 @@ class NewClothingFragment : Fragment() {
         addClothingButton.setOnClickListener {
             addNewClothing()
         }
+
+        goBackImageButton.setOnClickListener {
+            goBack()
+        }
+    }
+
+    private fun displayTagsAndTypes(types: Array<String>){
+        val inflater = LayoutInflater.from(requireContext())
+
+        for(type in types){
+            val radioButton = RadioButton(requireContext())
+            val radioButtonLayoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                120
+            ).also { radioButton.layoutParams = it }
+            radioButtonLayoutParams.setMargins(0, 0, 20, 0)
+            radioButton.setPadding(25, 15, 25, 15)
+            radioButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
+            radioButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.radio_border)
+            radioButton.buttonDrawable = null
+            radioButton.text = type.toString()
+            radioButton.textSize = 14f
+
+            itemTypeRadioGroup.addView(radioButton)
+        }
+
+    }
+
+    private fun goBack(){
+        val fragmentManager = requireActivity().supportFragmentManager
+        fragmentManager.popBackStack()
     }
 
     private fun chooseImage(){
@@ -99,13 +140,19 @@ class NewClothingFragment : Fragment() {
     private fun addNewClothing(){
         val title = titleEditText.text.toString()
         val tags = listOf("test")
+        val checkedRadio = itemTypeRadioGroup.checkedRadioButtonId
+        Toast.makeText(requireContext(), "$checkedRadio", Toast.LENGTH_SHORT).show()
 
+        if(!::pickedImageUri.isInitialized){
+            Toast.makeText(requireContext(), "Please select an image", Toast.LENGTH_SHORT).show()
+            return
+        }
         if(title.isEmpty()){
             Toast.makeText(requireContext(), "Invalid title", Toast.LENGTH_SHORT).show()
             return
         }
-        if(!::pickedImageUri.isInitialized){
-            Toast.makeText(requireContext(), "Please select an image", Toast.LENGTH_SHORT).show()
+        if(checkedRadio == -1){
+            Toast.makeText(requireContext(), "Select item type", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -115,6 +162,7 @@ class NewClothingFragment : Fragment() {
         val newClothingItem = ClothingItem(
             imageName = imageName,
             name = title,
+            type = checkedRadio+1,
             tags = tags
         )
 

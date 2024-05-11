@@ -4,4 +4,5 @@
     <color name="font">#fdfdfd</color>
     <color name="fontThin">#70fdfdfd</color>
     <color name="accent">#413f40</color>
+    <color name="accentSecondary">#ffdcb4</color>
 </resources>
