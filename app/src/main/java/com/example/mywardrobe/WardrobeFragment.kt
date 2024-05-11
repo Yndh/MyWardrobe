@@ -183,7 +183,7 @@ class WardrobeFragment : Fragment() {
                 )
                 itemTagTextView.textSize = 16f
                 itemTagTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-                itemTagTextView.text = tag
+                itemTagTextView.text = ClothingTagsManager.getTagName(tag.toInt())
                 itemTagTextView.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_border)
                 itemTagTextView.setPadding(20, 10, 20, 10)
 

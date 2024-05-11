@@ -19,9 +19,12 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.setPadding
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.view.Gravity
+import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +44,8 @@ class NewClothingFragment : Fragment() {
     private lateinit var pickedImageUri: Uri
     private lateinit var goBackImageButton: ImageButton
     private lateinit var itemTypeRadioGroup: RadioGroup
+    private lateinit var tagsLinearLayout: LinearLayout
+    private lateinit var noTagsLinearLayout: LinearLayout
 
 
     override fun onCreateView(
@@ -59,8 +64,12 @@ class NewClothingFragment : Fragment() {
         titleEditText = view.findViewById(R.id.titleEditText)
         goBackImageButton = view.findViewById(R.id.goBackImageButton)
         itemTypeRadioGroup = view.findViewById(R.id.itemTypeRadioGroup)
+        tagsLinearLayout = view.findViewById(R.id.tagsLinearLayout)
+        noTagsLinearLayout = view.findViewById(R.id.noTagsLinearLayout)
 
-        displayTagsAndTypes(ClothingTypesManager.getTypes())
+        val types = ClothingTypesManager.getTypes()
+        val tags = ClothingTagsManager.getTags()
+        displayTagsAndTypes(types, tags)
 
         pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
@@ -87,7 +96,7 @@ class NewClothingFragment : Fragment() {
         }
     }
 
-    private fun displayTagsAndTypes(types: List<String>){
+    private fun displayTagsAndTypes(types: List<String>, tags: List<Tag>){
         val inflater = LayoutInflater.from(requireContext())
 
         for(type in types){
@@ -105,6 +114,40 @@ class NewClothingFragment : Fragment() {
             radioButton.textSize = 14f
 
             itemTypeRadioGroup.addView(radioButton)
+        }
+
+        if(tags.isEmpty()){
+            val textView = TextView(requireContext())
+            val textViewLayoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                120
+            ).also { textView.layoutParams = it }
+            textView.setPadding(25,15,25,15)
+            textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
+            textView.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_border)
+            textView.text = "You don't have any tags"
+            textView.textSize = 14f
+            textView.gravity = Gravity.CENTER
+            textView.textAlignment = View.TEXT_ALIGNMENT_CENTER
+
+            noTagsLinearLayout.addView(textView)
+            return
+        }
+        for(tag in tags){
+            val checkbox = CheckBox(requireContext())
+            val checkboxLayoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                120
+            ).also { checkbox.layoutParams = it }
+            checkboxLayoutParams.setMargins(0, 0, 20, 0)
+            checkbox.setPadding(25, 15, 25, 15)
+            checkbox.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
+            checkbox.background = ContextCompat.getDrawable(requireContext(), R.drawable.radio_border)
+            checkbox.buttonDrawable = null
+            checkbox.text = tag.name.toString()
+            checkbox.textSize = 14f
+
+            tagsLinearLayout.addView(checkbox)
         }
 
     }
@@ -139,7 +182,7 @@ class NewClothingFragment : Fragment() {
 
     private fun addNewClothing(){
         val title = titleEditText.text.toString()
-        val tags = listOf("test")
+        val tags = mutableListOf<Int>()
         val checkedRadio = itemTypeRadioGroup.checkedRadioButtonId
 
         if(!::pickedImageUri.isInitialized){
@@ -155,13 +198,21 @@ class NewClothingFragment : Fragment() {
             return
         }
 
+        for(i in 0 until tagsLinearLayout.childCount){
+            val view = tagsLinearLayout.getChildAt(i)
+            if(view is CheckBox && view.isChecked){
+                tags.add(i)
+                Toast.makeText(requireContext(), "$i to jest i", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         val imageByteArray = convertImageToByteArray(requireContext(), pickedImageUri)
         val imageName = "${System.currentTimeMillis()}.png"
 
         val newClothingItem = ClothingItem(
             imageName = imageName,
             name = title,
-            type = checkedRadio+1,
+            type = checkedRadio,
             tags = tags
         )
 

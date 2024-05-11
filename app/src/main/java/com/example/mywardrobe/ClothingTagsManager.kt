@@ -28,7 +28,7 @@ object ClothingTagsManager {
     }
 
     fun getTagName(index: Int): String {
-        if(index > clothingTags.size+1 || index < 1){
+        if(index > clothingTags.size || index < 0){
             return "Invalid index"
         }
 

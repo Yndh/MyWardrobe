@@ -18,7 +18,7 @@ data class ClothingItem(
     val imageName: String,
     val name: String,
     val type: Number,
-    val tags: List<String>
+    val tags: List<Int>
 )
 
 object ClothingItemsManager {

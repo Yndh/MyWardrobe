@@ -7,7 +7,7 @@ object ClothingTypesManager {
         return itemTypes
     }
     fun getTypeName(index: Int): String{
-        if(index > itemTypes.size+1 || index < 1){
+        if(index > itemTypes.size || index < 0){
             return "Invalid index"
         }
 
