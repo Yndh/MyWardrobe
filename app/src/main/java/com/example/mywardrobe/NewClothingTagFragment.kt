@@ -58,6 +58,7 @@ class NewClothingTagFragment : Fragment() {
         }
 
         val tag = Tag(
+            id = ClothingTagsManager.generateId(),
             name = name
         )
 

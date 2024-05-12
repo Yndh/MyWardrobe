@@ -210,6 +210,7 @@ class NewClothingFragment : Fragment() {
         val imageName = "${System.currentTimeMillis()}.png"
 
         val newClothingItem = ClothingItem(
+            id = ClothingItemsManager.generateId(),
             imageName = imageName,
             name = title,
             type = checkedRadio,

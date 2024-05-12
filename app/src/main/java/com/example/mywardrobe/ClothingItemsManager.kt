@@ -15,6 +15,7 @@ import java.io.FileNotFoundException
 import java.io.InputStreamReader
 
 data class ClothingItem(
+    val id: Number,
     val imageName: String,
     val name: String,
     val type: Number,
@@ -23,6 +24,10 @@ data class ClothingItem(
 
 object ClothingItemsManager {
     private val clothingItems = mutableListOf<ClothingItem>()
+
+    fun generateId(): Number{
+        return clothingItems.size+1
+    }
 
     fun addClothingItem(item: ClothingItem){
         clothingItems.add(item)

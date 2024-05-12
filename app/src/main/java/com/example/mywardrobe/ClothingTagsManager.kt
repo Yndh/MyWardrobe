@@ -13,11 +13,16 @@ import java.io.FileNotFoundException
 import java.io.InputStreamReader
 
 data class Tag(
+    val id: Number,
     val name: String
 )
 
 object ClothingTagsManager {
     private val clothingTags = mutableListOf<Tag>()
+
+    fun generateId(): Number{
+        return clothingTags.size+1
+    }
 
     fun addTag(tag: Tag) {
         clothingTags.add(tag)
@@ -27,12 +32,9 @@ object ClothingTagsManager {
         return clothingTags
     }
 
-    fun getTagName(index: Int): String {
-        if(index > clothingTags.size || index < 0){
-            return "Invalid index"
-        }
-
-        return clothingTags[index.toInt()].name
+    fun getTagName(id: Number): String? {
+        val tag = clothingTags.find { it.id == id }
+        return tag?.name
     }
 
 
