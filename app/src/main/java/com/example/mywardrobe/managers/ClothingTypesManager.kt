@@ -1,4 +1,4 @@
-package com.example.mywardrobe
+package com.example.mywardrobe.managers
 
 object ClothingTypesManager {
     private val itemTypes = mutableListOf("Headwear", "Tops", "Bottoms", "Footwear")

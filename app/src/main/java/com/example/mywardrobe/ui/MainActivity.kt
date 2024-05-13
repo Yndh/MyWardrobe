@@ -1,13 +1,19 @@
-package com.example.mywardrobe
+package com.example.mywardrobe.ui
 
 
-import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import com.example.mywardrobe.managers.ClothingItemsManager
+import com.example.mywardrobe.managers.ClothingTagsManager
+import com.example.mywardrobe.ui.fragments.HomeFragment
+import com.example.mywardrobe.R
+import com.example.mywardrobe.ui.fragments.CreateFragment
+import com.example.mywardrobe.ui.fragments.WardrobeFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 

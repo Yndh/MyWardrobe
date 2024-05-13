@@ -1,4 +1,4 @@
-package com.example.mywardrobe
+package com.example.mywardrobe.managers
 
 import android.content.Context
 import android.util.Log

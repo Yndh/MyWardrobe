@@ -1,4 +1,4 @@
-package com.example.mywardrobe
+package com.example.mywardrobe.ui.fragments
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -13,12 +13,14 @@ import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RadioButton
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginRight
-import androidx.core.view.marginTop
-import androidx.core.view.setPadding
+import com.example.mywardrobe.R
+import com.example.mywardrobe.managers.ClothingItem
+import com.example.mywardrobe.managers.ClothingItemsManager
+import com.example.mywardrobe.managers.ClothingTagsManager
+import com.example.mywardrobe.managers.ClothingTypesManager
+import com.example.mywardrobe.managers.Tag
 
 class WardrobeFragment : Fragment() {
 
@@ -56,8 +58,6 @@ class WardrobeFragment : Fragment() {
     }
 
     fun displayTypesAndTags(types: List<String>, tags: List<Tag>){
-        val inflater = LayoutInflater.from(requireContext())
-
         for(type in types){
             val checkbox = CheckBox(requireContext())
             val checkboxLayoutParams = LinearLayout.LayoutParams(
@@ -67,7 +67,9 @@ class WardrobeFragment : Fragment() {
             checkboxLayoutParams.setMargins(0, 0, 20, 0)
             checkbox.setPadding(25, 15, 25, 15)
             checkbox.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-            checkbox.background = ContextCompat.getDrawable(requireContext(), R.drawable.radio_border)
+            checkbox.background = ContextCompat.getDrawable(requireContext(),
+                R.drawable.radio_border
+            )
             checkbox.buttonDrawable = null
             checkbox.text = type.toString()
             checkbox.textSize = 14f
@@ -84,7 +86,9 @@ class WardrobeFragment : Fragment() {
             checkboxLayoutParams.setMargins(0, 0, 20, 0)
             checkbox.setPadding(25, 15, 25, 15)
             checkbox.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-            checkbox.background = ContextCompat.getDrawable(requireContext(), R.drawable.radio_border)
+            checkbox.background = ContextCompat.getDrawable(requireContext(),
+                R.drawable.radio_border
+            )
             checkbox.buttonDrawable = null
             checkbox.text = tag.name.toString()
             checkbox.textSize = 14f
@@ -117,7 +121,31 @@ class WardrobeFragment : Fragment() {
     }
 
     fun displayClothingItems(clothingItems: List<ClothingItem>){
-        val inflater = LayoutInflater.from(requireContext())
+        if(clothingItems.isEmpty()){
+            val linearLayout = LinearLayout(requireContext())
+            val linearLayoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            ).also { linearLayout.layoutParams = it }
+            linearLayoutParams.setMargins(0, 0, 0, 50)
+            linearLayout.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_border)
+            linearLayout.setPadding(40, 30, 40, 30)
+
+            val text = TextView(requireContext())
+            text.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+            )
+            text.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
+            text.textSize = 16f
+            text.textAlignment = View.TEXT_ALIGNMENT_CENTER
+            text.text = "You don't have any pieces yet"
+
+            linearLayout.addView(text)
+            wardobeLinearLayout.addView(linearLayout)
+
+            return
+        }
 
         for (item in clothingItems) {
             val outerLinearLayout = LinearLayout(requireContext())
@@ -133,7 +161,12 @@ class WardrobeFragment : Fragment() {
                 230,
                 230
             )
-            imageView.setImageBitmap(ClothingItemsManager.getImage(requireContext(), item.imageName))
+            imageView.setImageBitmap(
+                ClothingItemsManager.getImage(
+                    requireContext(),
+                    item.imageName
+                )
+            )
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
 
             val innerLinearLayout = LinearLayout(requireContext())
@@ -141,7 +174,7 @@ class WardrobeFragment : Fragment() {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT
             ).also { innerLinearLayout.layoutParams = it }
-            innerLayoutParams.setMargins(70, 0, 0 ,0)
+            innerLayoutParams.setMargins(70, 0, 0, 0)
             innerLinearLayout.orientation = LinearLayout.VERTICAL
 
 
@@ -170,12 +203,15 @@ class WardrobeFragment : Fragment() {
             itemTypeParams.setMargins(0, 0, 20, 0)
             itemTypeTextView.textSize = 16f
             itemTypeTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-            itemTypeTextView.text = ClothingTypesManager.getTypeName(item.type.toInt())
-            itemTypeTextView.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_border)
+            itemTypeTextView.text = "#${item.type} ${ClothingTypesManager.getTypeName(item.type.toInt())}"
+            itemTypeTextView.background = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.rounded_border
+            )
             itemTypeTextView.setPadding(20, 10, 20, 10)
             tagLinearLayout.addView(itemTypeTextView)
 
-            for(tag in item.tags){
+            for (tag in item.tags) {
                 val itemTagTextView = TextView(requireContext())
                 itemTagTextView.layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -184,7 +220,10 @@ class WardrobeFragment : Fragment() {
                 itemTagTextView.textSize = 16f
                 itemTagTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
                 itemTagTextView.text = ClothingTagsManager.getTagName(tag.toInt())
-                itemTagTextView.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_border)
+                itemTagTextView.background = ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.rounded_border
+                )
                 itemTagTextView.setPadding(20, 10, 20, 10)
 
                 tagLinearLayout.addView(itemTagTextView)
@@ -196,8 +235,8 @@ class WardrobeFragment : Fragment() {
             outerLinearLayout.addView(imageView)
             outerLinearLayout.addView(innerLinearLayout)
             wardobeLinearLayout.addView(outerLinearLayout)
-
         }
+
     }
 
     fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {

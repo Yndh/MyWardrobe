@@ -1,21 +1,21 @@
-package com.example.mywardrobe
+package com.example.mywardrobe.ui.fragments
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import androidx.fragment.app.Fragment
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
-import com.google.gson.Gson
+import com.example.mywardrobe.R
+import com.example.mywardrobe.managers.ClothingTagsManager
+import com.example.mywardrobe.managers.Tag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class NewClothingTagFragment : Fragment() {
 
