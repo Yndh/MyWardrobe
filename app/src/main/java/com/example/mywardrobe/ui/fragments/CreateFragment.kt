@@ -25,6 +25,7 @@ import com.example.mywardrobe.managers.ClothingTypesManager
 import com.example.mywardrobe.managers.Outfit
 import com.example.mywardrobe.managers.OutfitManager
 import com.example.mywardrobe.managers.Tag
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -63,7 +64,15 @@ class CreateFragment : Fragment() {
 
         displayTypesAndTags(types, tags, clothingItems)
 
-        generateOutfit(clothingItems)
+        val selectedOutfitJson = arguments?.getString("outfit")
+        if(selectedOutfitJson != null){
+            val selectedOutfit = Gson().fromJson(selectedOutfitJson, Outfit::class.java)
+            outfit = selectedOutfit.items.associateBy { it.type.toInt() }.toMutableMap()
+            displayOutfit(outfit)
+            saveButton.setImageResource(R.drawable.baseline_favorite_24)
+        }else {
+            generateOutfit(clothingItems)
+        }
 
         generateButton.setOnClickListener {
             generateOutfit(clothingItems)

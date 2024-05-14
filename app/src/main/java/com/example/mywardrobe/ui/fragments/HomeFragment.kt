@@ -15,6 +15,7 @@ import com.example.mywardrobe.R
 import com.example.mywardrobe.managers.ClothingItemsManager
 import com.example.mywardrobe.managers.Outfit
 import com.example.mywardrobe.managers.OutfitManager
+import com.google.gson.Gson
 
 class HomeFragment : Fragment() {
 
@@ -62,6 +63,21 @@ class HomeFragment : Fragment() {
                 imageView.setImageBitmap(ClothingItemsManager.getImage(requireContext(), item.imageName))
 
                 outerLinearLayout.addView(imageView)
+            }
+
+            outerLinearLayout.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putString("outfit", Gson().toJson(outfit))
+                }
+
+                val createFragment = CreateFragment().apply {
+                    arguments = bundle
+                }
+
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentFrame, createFragment)
+                    .addToBackStack(null)
+                    .commit()
             }
 
             outfitsLinearLayout.addView(outerLinearLayout)
