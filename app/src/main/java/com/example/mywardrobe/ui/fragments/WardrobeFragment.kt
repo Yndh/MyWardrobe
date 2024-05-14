@@ -203,7 +203,7 @@ class WardrobeFragment : Fragment() {
             itemTypeParams.setMargins(0, 0, 20, 0)
             itemTypeTextView.textSize = 16f
             itemTypeTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-            itemTypeTextView.text = "#${item.type} ${ClothingTypesManager.getTypeName(item.type.toInt())}"
+            itemTypeTextView.text = ClothingTypesManager.getTypeName(item.type.toInt())
             itemTypeTextView.background = ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.rounded_border

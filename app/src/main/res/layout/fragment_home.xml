@@ -37,98 +37,11 @@
            android:scrollbars="none">
 
            <LinearLayout
+               android:id="@+id/outfitsLinearLayout"
                android:layout_width="match_parent"
                android:layout_height="match_parent"
                android:orientation="horizontal">
-               <LinearLayout
-                   android:layout_width="wrap_content"
-                   android:layout_height="200dp"
-                   android:background="@drawable/rounded_border"
-                   android:orientation="horizontal"
-                   android:padding="10dp"
-                   android:layout_marginRight="10dp"
-                   >
-                   <LinearLayout
-                       android:layout_width="120dp"
-                       android:layout_height="match_parent"
-                       android:orientation="vertical"
-                       android:gravity="center"
-                       >
-                       <ImageView
-                           android:layout_width="80dp"
-                           android:layout_height="80dp"
-                           android:src="@drawable/tylertee"
-                           android:scaleType="fitCenter"
-                           android:layout_gravity="center"
-                           />
-                       <ImageView
-                           android:layout_width="80dp"
-                           android:layout_height="80dp"
-                           android:src="@drawable/jinco"
-                           android:scaleType="fitCenter"
-                           android:layout_gravity="center"
-                           />
-                   </LinearLayout>
-                   <LinearLayout
-                       android:layout_width="100dp"
-                       android:layout_height="match_parent"
-                       android:orientation="vertical"
-                       android:gravity="center"
-                       >
-                       <ImageView
-                           android:layout_width="80dp"
-                           android:layout_height="80dp"
-                           android:src="@drawable/timbs"
-                           android:scaleType="fitCenter"
-                           android:layout_gravity="center"
-                           />
-                   </LinearLayout>
-               </LinearLayout>
 
-               <LinearLayout
-                   android:layout_width="wrap_content"
-                   android:layout_height="200dp"
-                   android:background="@drawable/rounded_border"
-                   android:orientation="horizontal"
-                   android:padding="10dp"
-                   android:layout_marginRight="10dp"
-                   >
-                   <LinearLayout
-                       android:layout_width="120dp"
-                       android:layout_height="match_parent"
-                       android:orientation="vertical"
-                       android:gravity="center"
-                       >
-                       <ImageView
-                           android:layout_width="80dp"
-                           android:layout_height="80dp"
-                           android:src="@drawable/carhartt"
-                           android:scaleType="fitCenter"
-                           android:layout_gravity="center"
-                           />
-                       <ImageView
-                           android:layout_width="80dp"
-                           android:layout_height="80dp"
-                           android:src="@drawable/jinco"
-                           android:scaleType="fitCenter"
-                           android:layout_gravity="center"
-                           />
-                   </LinearLayout>
-                   <LinearLayout
-                       android:layout_width="100dp"
-                       android:layout_height="match_parent"
-                       android:orientation="vertical"
-                       android:gravity="center"
-                       >
-                       <ImageView
-                           android:layout_width="80dp"
-                           android:layout_height="80dp"
-                           android:src="@drawable/timbs"
-                           android:scaleType="fitCenter"
-                           android:layout_gravity="center"
-                           />
-                   </LinearLayout>
-               </LinearLayout>
            </LinearLayout>
 
        </HorizontalScrollView>

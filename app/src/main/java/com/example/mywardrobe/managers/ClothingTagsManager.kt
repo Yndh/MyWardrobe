@@ -21,7 +21,8 @@ object ClothingTagsManager {
     private val clothingTags = mutableListOf<Tag>()
 
     fun generateId(): Number{
-        return clothingTags.size+1
+        val lastId = clothingTags.lastOrNull()?.id as? Int ?: 0
+        return lastId+1
     }
 
     fun addTag(tag: Tag) {

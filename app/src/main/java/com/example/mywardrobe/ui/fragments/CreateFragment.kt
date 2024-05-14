@@ -22,11 +22,17 @@ import com.example.mywardrobe.managers.ClothingItem
 import com.example.mywardrobe.managers.ClothingItemsManager
 import com.example.mywardrobe.managers.ClothingTagsManager
 import com.example.mywardrobe.managers.ClothingTypesManager
+import com.example.mywardrobe.managers.Outfit
+import com.example.mywardrobe.managers.OutfitManager
 import com.example.mywardrobe.managers.Tag
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class CreateFragment : Fragment() {
 
     lateinit var generateButton: ImageButton
+    lateinit var saveButton: ImageButton
     private lateinit var outfitLinearLayout: LinearLayout
     private lateinit var typesLinearLayout: LinearLayout
     private lateinit var tagsLinearLayout: LinearLayout
@@ -44,6 +50,7 @@ class CreateFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         generateButton = view.findViewById(R.id.generateButton)
+        saveButton = view.findViewById(R.id.saveButton)
         typesLinearLayout = view.findViewById(R.id.typesLinearLayout)
         tagsLinearLayout = view.findViewById(R.id.tagsLinearLayout)
         outfitLinearLayout = view.findViewById(R.id.outfitLinearLayout)
@@ -60,6 +67,10 @@ class CreateFragment : Fragment() {
 
         generateButton.setOnClickListener {
             generateOutfit(clothingItems)
+        }
+
+        saveButton.setOnClickListener {
+            saveOutfit(outfit)
         }
     }
 
@@ -181,6 +192,30 @@ class CreateFragment : Fragment() {
             outfit[buttonView.id] = typeItems.random()
             displayOutfit(outfit)
         }
+    }
+
+    private fun saveOutfit(outfit: MutableMap<Int, ClothingItem>){
+        val newOutfit = Outfit(
+            id = OutfitManager.generateId(),
+            items = outfit.values.toList()
+        )
+
+        OutfitManager.addOutfit(newOutfit)
+
+        val outfits = OutfitManager.getOutfits()
+
+        GlobalScope.launch(Dispatchers.Main) {
+            val dataResult = OutfitManager.saveOutfits(requireContext(), outfits)
+            if(dataResult){
+                Log.d("CreateFragment", "Outfit file saved")
+                saveButton.setImageResource(R.drawable.baseline_favorite_24)
+                Toast.makeText(requireContext(), "Outfit has been saved successfully", Toast.LENGTH_SHORT).show()
+
+            } else {
+                Toast.makeText(requireContext(), "Failed to save item", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 
 }

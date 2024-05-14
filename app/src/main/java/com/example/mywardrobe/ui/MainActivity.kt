@@ -12,6 +12,7 @@ import com.example.mywardrobe.managers.ClothingItemsManager
 import com.example.mywardrobe.managers.ClothingTagsManager
 import com.example.mywardrobe.ui.fragments.HomeFragment
 import com.example.mywardrobe.R
+import com.example.mywardrobe.managers.OutfitManager
 import com.example.mywardrobe.ui.fragments.CreateFragment
 import com.example.mywardrobe.ui.fragments.WardrobeFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
 
         ClothingItemsManager.loadClothingItems(applicationContext)
         ClothingTagsManager.loadClothingTags(applicationContext)
+        OutfitManager.loadOutfits(applicationContext)
 
         navigation = findViewById(R.id.navigationView)
 

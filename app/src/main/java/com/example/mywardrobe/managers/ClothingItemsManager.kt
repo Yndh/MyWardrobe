@@ -26,7 +26,8 @@ object ClothingItemsManager {
     private val clothingItems = mutableListOf<ClothingItem>()
 
     fun generateId(): Number{
-        return clothingItems.size+1
+        val lastId = clothingItems.lastOrNull()?.id as? Int ?: 0
+        return lastId + 1
     }
 
     fun addClothingItem(item: ClothingItem){

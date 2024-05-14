@@ -85,9 +85,10 @@
                     />
 
                 <ImageButton
+                    android:id="@+id/saveButton"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/baseline_favorite_24"
+                    android:src="@drawable/baseline_favorite_border_24"
                     android:scaleType="fitCenter"
                     android:padding="12dp"
                     android:background="@drawable/rounded_border"
