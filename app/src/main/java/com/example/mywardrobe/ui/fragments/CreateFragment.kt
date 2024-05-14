@@ -3,14 +3,17 @@ package com.example.mywardrobe.ui.fragments
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.CompoundButton
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.LinearLayout.LayoutParams
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -23,12 +26,11 @@ import com.example.mywardrobe.managers.Tag
 
 class CreateFragment : Fragment() {
 
-    lateinit var headwearImageView: ImageView
-    lateinit var topsImageView: ImageView
-    lateinit var bottomsImageView: ImageView
-    lateinit var footwearImageView: ImageView
     lateinit var generateButton: ImageButton
-    private lateinit var tagsAndTypesLinearLayout: LinearLayout
+    private lateinit var outfitLinearLayout: LinearLayout
+    private lateinit var typesLinearLayout: LinearLayout
+    private lateinit var tagsLinearLayout: LinearLayout
+    private lateinit var outfit: MutableMap<Int, ClothingItem>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,12 +43,12 @@ class CreateFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        headwearImageView = view.findViewById(R.id.headwearImageView)
-        topsImageView = view.findViewById(R.id.topsImageView)
-        bottomsImageView = view.findViewById(R.id.bottomsImageView)
-        footwearImageView = view.findViewById(R.id.footwearImageView)
         generateButton = view.findViewById(R.id.generateButton)
-        tagsAndTypesLinearLayout = view.findViewById(R.id.tagsAndTypesLinearLayout)
+        typesLinearLayout = view.findViewById(R.id.typesLinearLayout)
+        tagsLinearLayout = view.findViewById(R.id.tagsLinearLayout)
+        outfitLinearLayout = view.findViewById(R.id.outfitLinearLayout)
+
+        outfit = mutableMapOf()
 
         val clothingItems = ClothingItemsManager.getClothingItems()
         val types = ClothingTypesManager.getTypes()
@@ -62,6 +64,7 @@ class CreateFragment : Fragment() {
     }
 
     fun displayTypesAndTags(types: List<String>, tags: List<Tag>, clothingItems: List<ClothingItem>){
+        var typesIdCounter = 1
         for(type in types){
             val checkbox = CheckBox(requireContext())
             val checkboxLayoutParams = LinearLayout.LayoutParams(
@@ -77,14 +80,19 @@ class CreateFragment : Fragment() {
             checkbox.buttonDrawable = null
             checkbox.text = type.toString()
             checkbox.textSize = 14f
+            checkbox.id = typesIdCounter++
+            checkbox.setOnCheckedChangeListener { buttonView, isChecked ->
+                toggleOutfitType(buttonView, outfit, clothingItems)
+            }
             val typeItems = clothingItems.filter { ClothingTypesManager.getTypeName(it.type.toInt()) == type }
             if(typeItems.isNotEmpty()){
                 checkbox.isChecked = true
             }
 
-            tagsAndTypesLinearLayout.addView(checkbox)
+            typesLinearLayout.addView(checkbox)
         }
 
+        var tagsIdCounter = 1
         for(tag in tags){
             val checkbox = CheckBox(requireContext())
             val checkboxLayoutParams = LinearLayout.LayoutParams(
@@ -100,71 +108,79 @@ class CreateFragment : Fragment() {
             checkbox.buttonDrawable = null
             checkbox.text = tag.name.toString()
             checkbox.textSize = 14f
+            checkbox.id = tagsIdCounter++
 
-            tagsAndTypesLinearLayout.addView(checkbox)
+            tagsLinearLayout.addView(checkbox)
         }
-
-        val button = Button(requireContext())
-        val buttonLayoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            90
-        ).also { button.layoutParams = it }
-        buttonLayoutParams.setMargins(10, 0, 20, 0)
-        button.setPadding(25, 15, 25, 15)
-        button.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-        button.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_border)
-        button.text = "Create New Tag"
-        button.isAllCaps = false
-        button.textSize = 14f
-        button.setTypeface(null, Typeface.BOLD)
-        button.setOnClickListener {
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentFrame, NewClothingTagFragment())
-                .addToBackStack(null)
-                .commit()
-        }
-
-        tagsAndTypesLinearLayout.addView(button)
-
     }
 
 
-    fun generateOutfit(clothingItems: List<ClothingItem>){
-        for (item in clothingItems) {
-            Log.d("ClothingItem", item.toString())
+
+    fun displayOutfit(outfit: MutableMap<Int, ClothingItem>){
+        outfitLinearLayout.removeAllViews()
+        for((key, item) in outfit.toSortedMap()){
+            val itemImageView = ImageView(requireContext())
+            val itemImageViewLayoutParams = LinearLayout.LayoutParams(
+                350,
+                350
+            ).also{ itemImageView.layoutParams = it }
+            itemImageViewLayoutParams.setMargins(0, 0, 0, 10)
+            itemImageViewLayoutParams.gravity = Gravity.CENTER
+            itemImageView.setImageBitmap(ClothingItemsManager.getImage(requireContext(), item.imageName))
+            itemImageView.scaleType = ImageView.ScaleType.CENTER_CROP
+
+
+            outfitLinearLayout.addView(itemImageView)
         }
-        val headwearList = clothingItems.filter { it.type.toInt() == 1 }
-        val topsList = clothingItems.filter { it.type.toInt() == 2 }
-        val bottomsList = clothingItems.filter { it.type.toInt() == 3 }
-        val footwearList = clothingItems.filter { it.type.toInt() == 4 }
+    }
 
+    fun generateOutfit(clothingItems: List<ClothingItem>){
+        val selectedTypes = mutableListOf<Int>()
 
-        Log.d("FilteredLists", "Headwear List: $headwearList")
-        Log.d("FilteredLists", "Tops List: $topsList")
-        Log.d("FilteredLists", "Bottoms List: $bottomsList")
-        Log.d("FilteredLists", "Footwear List: $footwearList")
+        for (i in 0 until typesLinearLayout.childCount){
+            val view = typesLinearLayout.getChildAt(i)
+            if(view is CheckBox && view.isChecked){
 
-        if (headwearList.isEmpty() || topsList.isEmpty() || bottomsList.isEmpty() || footwearList.isEmpty()) {
-            Toast.makeText(requireContext(), "Not enough items for a complete outfit", Toast.LENGTH_SHORT).show()
+                selectedTypes.add(view.id)
+            }
+        }
+
+        if (selectedTypes.isEmpty()) {
+            Toast.makeText(requireContext(), "Please select at least one clothing type", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val headwear = headwearList.randomOrNull()
-        val top = topsList.randomOrNull()
-        val bottom = bottomsList.randomOrNull()
-        val footwear = footwearList.randomOrNull()
+        val filteredItems = clothingItems.filter { selectedTypes.contains(it.type.toInt()) }
 
-        headwearImageView.setImageBitmap(
-            ClothingItemsManager.getImage(requireContext(), headwear?.imageName as String)
-        )
-        topsImageView.setImageBitmap(
-            ClothingItemsManager.getImage(requireContext(), top?.imageName as String)
-        )
-        bottomsImageView.setImageBitmap(
-            ClothingItemsManager.getImage(requireContext(), bottom?.imageName as String)
-        )
-        footwearImageView.setImageBitmap(
-            ClothingItemsManager.getImage(requireContext(), footwear?.imageName as String)
-        )
+        outfit = mutableMapOf()
+        for (type in selectedTypes) {
+            val typeItems = filteredItems.filter { it.type.toInt() == type }
+            if (typeItems.isNotEmpty()) {
+                outfit[type] = typeItems.random()
+            }
+        }
+
+        if (outfit.size < selectedTypes.size) {
+            Toast.makeText(requireContext(), "Not enough pieces for selected types", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+       displayOutfit(outfit)
     }
+
+    fun toggleOutfitType(buttonView: CompoundButton, outfit: MutableMap<Int, ClothingItem>, clothingItems: List<ClothingItem> ){
+        if(!buttonView.isChecked){
+            outfit.remove(buttonView.id)
+            displayOutfit(outfit)
+        }else{
+            val typeItems = clothingItems.filter { it.type.toInt() == buttonView.id }
+            if (typeItems.isEmpty()) {
+                Toast.makeText(requireContext(), "You don't have any piece of this type", Toast.LENGTH_SHORT).show()
+                return
+            }
+            outfit[buttonView.id] = typeItems.random()
+            displayOutfit(outfit)
+        }
+    }
+
 }
