@@ -1,10 +1,13 @@
 package com.example.mywardrobe.ui.fragments
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,29 +15,42 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.CompoundButton
+import android.widget.GridView
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.example.mywardrobe.R
+import com.example.mywardrobe.adapters.ClothingItemAdapter
 import com.example.mywardrobe.managers.ClothingItem
 import com.example.mywardrobe.managers.ClothingItemsManager
 import com.example.mywardrobe.managers.ClothingTagsManager
 import com.example.mywardrobe.managers.ClothingTypesManager
 import com.example.mywardrobe.managers.Tag
+import com.example.mywardrobe.ui.fragments.ClothingItemDetailsFragment
+import com.example.mywardrobe.ui.fragments.NewClothingFragment
+import com.example.mywardrobe.ui.fragments.NewClothingTagFragment
 import com.google.gson.Gson
+
+private const val PREF_IS_LINEAR = "is_linear"
 
 class WardrobeFragment : Fragment() {
 
     private lateinit var newClothingButton: ImageButton
+    private lateinit var layoutTypeButton: ImageButton
+    private lateinit var wardrobeScrollView: ScrollView
     private lateinit var wardobeLinearLayout: LinearLayout
     private lateinit var typesLinearLayout: LinearLayout
     private lateinit var tagsLinearLayout: LinearLayout
 
     private val selectedTypes = mutableListOf<Int>()
     private val selectedTags = mutableListOf<Int>()
+    private lateinit var sharedPreferences: SharedPreferences
+
+    var isLinear: Boolean = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,9 +64,23 @@ class WardrobeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         newClothingButton = view.findViewById(R.id.addNewClothingButton)
+        layoutTypeButton = view.findViewById(R.id.layoutTypeButton)
         wardobeLinearLayout = view.findViewById(R.id.wardobeLinearLayout)
+        wardrobeScrollView = view.findViewById(R.id.wardrobeScrollView)
         typesLinearLayout = view.findViewById(R.id.typesLinearLayout)
         tagsLinearLayout = view.findViewById(R.id.tagsLinearLayout)
+
+        layoutTypeButton.setBackgroundResource(R.drawable.baseline_view_list_24)
+
+        sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+
+        isLinear = sharedPreferences.getBoolean(PREF_IS_LINEAR, true)
+
+        val clothingItems = ClothingItemsManager.getClothingItems()
+        displayClothingItems(clothingItems)
+        val clothingTypes = ClothingTypesManager.getTypes()
+        val clothingTags = ClothingTagsManager.getTags()
+        displayTypesAndTags(clothingTypes, clothingTags)
 
         newClothingButton.setOnClickListener {
             requireActivity().supportFragmentManager.beginTransaction()
@@ -59,11 +89,22 @@ class WardrobeFragment : Fragment() {
                 .commit()
         }
 
-        val clothingItems = ClothingItemsManager.getClothingItems()
-        displayClothingItems(clothingItems)
-        val clothingTypes = ClothingTypesManager.getTypes()
-        val clothingTags = ClothingTagsManager.getTags()
-        displayTypesAndTags(clothingTypes, clothingTags)
+        layoutTypeButton.setOnClickListener {
+            toggleLayout()
+        }
+    }
+
+    private fun toggleLayout() {
+        isLinear = !isLinear
+        sharedPreferences.edit().putBoolean(PREF_IS_LINEAR, isLinear).apply()
+
+        if(isLinear){
+            layoutTypeButton.setBackgroundResource(R.drawable.baseline_view_list_24)
+        }else{
+            layoutTypeButton.setBackgroundResource(R.drawable.baseline_grid_view_24)
+        }
+
+        displayClothingItems(ClothingItemsManager.getClothingItems())
     }
 
     fun displayTypesAndTags(types: List<String>, tags: List<Tag>){
@@ -143,7 +184,6 @@ class WardrobeFragment : Fragment() {
             for (selectedType in selectedTypes) {
                 Log.d("WardobeFragment", "$selectedType")
             }
-            Toast.makeText(requireContext(), "Type: ${buttonView?.id as Int}", Toast.LENGTH_SHORT).show()
         }else{
             selectedTypes.remove(buttonView?.id as Int)
         }
@@ -163,8 +203,6 @@ class WardrobeFragment : Fragment() {
         val filteredItems = if (selectedTypes.isEmpty() && selectedTags.isEmpty()) {
             ClothingItemsManager.getClothingItems()
         } else {
-
-            Toast.makeText(requireContext(), "", Toast.LENGTH_SHORT).show()
             ClothingItemsManager.getClothingItems().filter { item ->
                 val typeMatches = selectedTypes.isEmpty() || selectedTypes.contains(item.type.toInt())
                 val tagMatches = selectedTags.isEmpty() || item.tags.any { selectedTags.contains(it) }
@@ -176,7 +214,10 @@ class WardrobeFragment : Fragment() {
     }
 
     fun displayClothingItems(clothingItems: List<ClothingItem>){
+        wardobeLinearLayout.removeAllViews()
+
         if(clothingItems.isEmpty()){
+
             val linearLayout = LinearLayout(requireContext())
             val linearLayoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -202,108 +243,140 @@ class WardrobeFragment : Fragment() {
             return
         }
 
-        for (item in clothingItems) {
-            val outerLinearLayout = LinearLayout(requireContext())
-            val outerLayoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).also { outerLinearLayout.layoutParams = it }
-            outerLayoutParams.setMargins(0, 0, 0, 50)
-            outerLinearLayout.orientation = LinearLayout.HORIZONTAL
+        if(isLinear){
+            for (item in clothingItems) {
+                val outerLinearLayout = LinearLayout(requireContext())
+                val outerLayoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).also { outerLinearLayout.layoutParams = it }
+                outerLayoutParams.setMargins(0, 0, 0, 50)
+                outerLinearLayout.orientation = LinearLayout.HORIZONTAL
 
-            val imageView = ImageView(requireContext())
-            imageView.layoutParams = LinearLayout.LayoutParams(
-                230,
-                230
-            )
-            imageView.setImageBitmap(
-                ClothingItemsManager.getImage(
-                    requireContext(),
-                    item.imageName
+                val imageView = ImageView(requireContext())
+                imageView.layoutParams = LinearLayout.LayoutParams(
+                    230,
+                    230
                 )
-            )
-            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+                imageView.setImageBitmap(
+                    ClothingItemsManager.getImage(
+                        requireContext(),
+                        item.imageName
+                    )
+                )
+                imageView.scaleType = ImageView.ScaleType.CENTER_CROP
 
-            val innerLinearLayout = LinearLayout(requireContext())
-            val innerLayoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-            ).also { innerLinearLayout.layoutParams = it }
-            innerLayoutParams.setMargins(70, 0, 0, 0)
-            innerLinearLayout.orientation = LinearLayout.VERTICAL
+                val innerLinearLayout = LinearLayout(requireContext())
+                val innerLayoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                ).also { innerLinearLayout.layoutParams = it }
+                innerLayoutParams.setMargins(70, 0, 0, 0)
+                innerLinearLayout.orientation = LinearLayout.VERTICAL
 
 
-            val itemNameTextView = TextView(requireContext())
-            val itemNameLayoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).also { itemNameTextView.layoutParams = it }
-            itemNameLayoutParams.setMargins(0, 0, 0, 10)
-            itemNameTextView.textSize = 20f
-            itemNameTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-            itemNameTextView.text = item.name
+                val itemNameTextView = TextView(requireContext())
+                val itemNameLayoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).also { itemNameTextView.layoutParams = it }
+                itemNameLayoutParams.setMargins(0, 0, 0, 10)
+                itemNameTextView.textSize = 20f
+                itemNameTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
+                itemNameTextView.text = item.name
 
-            val tagLinearLayout = LinearLayout(requireContext())
-            tagLinearLayout.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-            )
-            tagLinearLayout.orientation = LinearLayout.HORIZONTAL
+                val tagLinearLayout = LinearLayout(requireContext())
+                tagLinearLayout.layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+                tagLinearLayout.orientation = LinearLayout.HORIZONTAL
 
-            val itemTypeTextView = TextView(requireContext())
-            val itemTypeParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).also { itemTypeTextView.layoutParams = it }
-            itemTypeParams.setMargins(0, 0, 20, 0)
-            itemTypeTextView.textSize = 16f
-            itemTypeTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-            itemTypeTextView.text = "${item.type} ${ClothingTypesManager.getTypeName(item.type.toInt())}"
-            itemTypeTextView.background = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.rounded_border
-            )
-            itemTypeTextView.setPadding(20, 10, 20, 10)
-            tagLinearLayout.addView(itemTypeTextView)
-
-            for (tag in item.tags) {
-                val itemTagTextView = TextView(requireContext())
-                itemTagTextView.layoutParams = LinearLayout.LayoutParams(
+                val itemTypeTextView = TextView(requireContext())
+                val itemTypeParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                itemTagTextView.textSize = 16f
-                itemTagTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-                itemTagTextView.text = "${tag} ${ClothingTagsManager.getTagName(tag.toInt())}"
-                itemTagTextView.background = ContextCompat.getDrawable(
+                ).also { itemTypeTextView.layoutParams = it }
+                itemTypeParams.setMargins(0, 0, 20, 0)
+                itemTypeTextView.textSize = 16f
+                itemTypeTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
+                itemTypeTextView.text = "${item.type} ${ClothingTypesManager.getTypeName(item.type.toInt())}"
+                itemTypeTextView.background = ContextCompat.getDrawable(
                     requireContext(),
                     R.drawable.rounded_border
                 )
-                itemTagTextView.setPadding(20, 10, 20, 10)
+                itemTypeTextView.setPadding(20, 10, 20, 10)
+                tagLinearLayout.addView(itemTypeTextView)
 
-                tagLinearLayout.addView(itemTagTextView)
+                for (tag in item.tags) {
+                    val itemTagTextView = TextView(requireContext())
+                    itemTagTextView.layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    itemTagTextView.textSize = 16f
+                    itemTagTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
+                    itemTagTextView.text = "${tag} ${ClothingTagsManager.getTagName(tag.toInt())}"
+                    itemTagTextView.background = ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.rounded_border
+                    )
+                    itemTagTextView.setPadding(20, 10, 20, 10)
+
+                    tagLinearLayout.addView(itemTagTextView)
+                }
+
+                outerLinearLayout.setOnClickListener {
+                    val bundle = Bundle().apply {
+                        putString("clothingItem", Gson().toJson(item))
+                    }
+
+                    val detailsFragment = ClothingItemDetailsFragment().apply {
+                        arguments = bundle
+                    }
+
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentFrame, detailsFragment)
+                        .addToBackStack(null)
+                        .commit()
+                }
+
+                innerLinearLayout.addView(itemNameTextView)
+                innerLinearLayout.addView(tagLinearLayout)
+                outerLinearLayout.addView(imageView)
+                outerLinearLayout.addView(innerLinearLayout)
+                wardobeLinearLayout.addView(outerLinearLayout)
+
             }
+            return
+        }else{
+            val wardrobeGridView = GridView(requireContext())
+            val wardrobeLayoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                clothingItems.size*200
+            ).also { wardrobeGridView.layoutParams = it }
+            wardrobeGridView.numColumns = 3
+            wardrobeLayoutParams.gravity = Gravity.CENTER
+            wardrobeGridView.requestLayout()
 
-            outerLinearLayout.setOnClickListener {
+            val adapter = ClothingItemAdapter(requireContext(), clothingItems)
+            wardrobeGridView.adapter = adapter
+
+            wardrobeGridView.setOnItemClickListener { parent, view, position, id ->
+                val item = clothingItems[position]
                 val bundle = Bundle().apply {
                     putString("clothingItem", Gson().toJson(item))
                 }
-
                 val detailsFragment = ClothingItemDetailsFragment().apply {
                     arguments = bundle
                 }
-
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.fragmentFrame, detailsFragment)
                     .addToBackStack(null)
                     .commit()
             }
 
-            innerLinearLayout.addView(itemNameTextView)
-            innerLinearLayout.addView(tagLinearLayout)
-            outerLinearLayout.addView(imageView)
-            outerLinearLayout.addView(innerLinearLayout)
-            wardobeLinearLayout.addView(outerLinearLayout)
+            wardobeLinearLayout.addView(wardrobeGridView)
         }
 
     }
