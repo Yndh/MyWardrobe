@@ -14,8 +14,8 @@ import java.io.InputStreamReader
 
 
 data class Outfit(
-    val id: Number,
-    val items: List<ClothingItem>
+    var id: Number,
+    var items: List<ClothingItem>
 )
 
 object OutfitManager {
@@ -28,6 +28,14 @@ object OutfitManager {
 
     fun addOutfit(outfit: Outfit){
         outfits.add(outfit)
+    }
+
+    fun removeOutfit(outfit: Outfit){
+        outfits.removeAll { it.items == outfit.items }
+    }
+
+    fun outfitExists(outfit: Outfit): Boolean{
+        return outfits.any { it.items == outfit.items }
     }
 
     fun getOutfits(): List<Outfit> {

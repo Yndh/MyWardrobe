@@ -152,6 +152,19 @@ class CreateFragment : Fragment() {
 
             outfitLinearLayout.addView(itemImageView)
         }
+
+        val newOutfit = Outfit(
+            id = OutfitManager.generateId(),
+            items = outfit.values.toList()
+        )
+
+        val outfitExists = OutfitManager.outfitExists(newOutfit)
+
+        if(outfitExists){
+            saveButton.setImageResource(R.drawable.baseline_favorite_24)
+        }else{
+            saveButton.setImageResource(R.drawable.baseline_favorite_border_24)
+        }
     }
 
     fun generateOutfit(clothingItems: List<ClothingItem>){
@@ -209,17 +222,26 @@ class CreateFragment : Fragment() {
             items = outfit.values.toList()
         )
 
-        OutfitManager.addOutfit(newOutfit)
+        val outfitExists = OutfitManager.outfitExists(newOutfit)
 
+        if(outfitExists){
+            OutfitManager.removeOutfit(newOutfit)
+        }else{
+            OutfitManager.addOutfit(newOutfit)
+        }
         val outfits = OutfitManager.getOutfits()
 
         GlobalScope.launch(Dispatchers.Main) {
             val dataResult = OutfitManager.saveOutfits(requireContext(), outfits)
             if(dataResult){
                 Log.d("CreateFragment", "Outfit file saved")
-                saveButton.setImageResource(R.drawable.baseline_favorite_24)
-                Toast.makeText(requireContext(), "Outfit has been saved successfully", Toast.LENGTH_SHORT).show()
-
+                if (outfitExists) {
+                    saveButton.setImageResource(R.drawable.baseline_favorite_border_24)
+                    Toast.makeText(requireContext(), "Outfit has been removed", Toast.LENGTH_SHORT).show()
+                } else {
+                    saveButton.setImageResource(R.drawable.baseline_favorite_24)
+                    Toast.makeText(requireContext(), "Outfit has been saved", Toast.LENGTH_SHORT).show()
+                }
             } else {
                 Toast.makeText(requireContext(), "Failed to save item", Toast.LENGTH_SHORT).show()
             }
