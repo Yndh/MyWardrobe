@@ -4,16 +4,19 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.CompoundButton
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.example.mywardrobe.R
 import com.example.mywardrobe.managers.ClothingItem
@@ -27,7 +30,11 @@ class WardrobeFragment : Fragment() {
 
     private lateinit var newClothingButton: ImageButton
     private lateinit var wardobeLinearLayout: LinearLayout
-    private lateinit var tagsAndTypesLinearLayout: LinearLayout
+    private lateinit var typesLinearLayout: LinearLayout
+    private lateinit var tagsLinearLayout: LinearLayout
+
+    private val selectedTypes = mutableListOf<Int>()
+    private val selectedTags = mutableListOf<Int>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,7 +49,8 @@ class WardrobeFragment : Fragment() {
 
         newClothingButton = view.findViewById(R.id.addNewClothingButton)
         wardobeLinearLayout = view.findViewById(R.id.wardobeLinearLayout)
-        tagsAndTypesLinearLayout = view.findViewById(R.id.tagsAndTypesLinearLayout)
+        typesLinearLayout = view.findViewById(R.id.typesLinearLayout)
+        tagsLinearLayout = view.findViewById(R.id.tagsLinearLayout)
 
         newClothingButton.setOnClickListener {
             requireActivity().supportFragmentManager.beginTransaction()
@@ -59,6 +67,7 @@ class WardrobeFragment : Fragment() {
     }
 
     fun displayTypesAndTags(types: List<String>, tags: List<Tag>){
+        var typeCheckboxIdCounter = 1
         for(type in types){
             val checkbox = CheckBox(requireContext())
             val checkboxLayoutParams = LinearLayout.LayoutParams(
@@ -74,8 +83,12 @@ class WardrobeFragment : Fragment() {
             checkbox.buttonDrawable = null
             checkbox.text = type.toString()
             checkbox.textSize = 14f
+            checkbox.id = typeCheckboxIdCounter++
+            checkbox.setOnCheckedChangeListener { buttonView, isChecked ->
+                typeChecked(buttonView, isChecked)
+            }
 
-            tagsAndTypesLinearLayout.addView(checkbox)
+            typesLinearLayout.addView(checkbox)
         }
 
         for(tag in tags){
@@ -93,8 +106,11 @@ class WardrobeFragment : Fragment() {
             checkbox.buttonDrawable = null
             checkbox.text = tag.name.toString()
             checkbox.textSize = 14f
+            checkbox.setOnCheckedChangeListener { buttonView, isChecked ->
+                tagChecked(isChecked, tag.id)
+            }
 
-            tagsAndTypesLinearLayout.addView(checkbox)
+            tagsLinearLayout.addView(checkbox)
         }
 
         val button = Button(requireContext())
@@ -117,8 +133,46 @@ class WardrobeFragment : Fragment() {
                 .commit()
         }
 
-        tagsAndTypesLinearLayout.addView(button)
+        tagsLinearLayout.addView(button)
 
+    }
+
+    private fun typeChecked(buttonView: CompoundButton?, checked: Boolean) {
+        if(checked){
+            selectedTypes.add(buttonView?.id as Int)
+            for (selectedType in selectedTypes) {
+                Log.d("WardobeFragment", "$selectedType")
+            }
+            Toast.makeText(requireContext(), "Type: ${buttonView?.id as Int}", Toast.LENGTH_SHORT).show()
+        }else{
+            selectedTypes.remove(buttonView?.id as Int)
+        }
+        filterClothingItems()
+    }
+
+    private fun tagChecked(checked: Boolean, id: Int) {
+        if(checked){
+            selectedTags.add(id)
+        }else{
+            selectedTags.remove(id)
+        }
+        filterClothingItems()
+    }
+
+    private fun filterClothingItems() {
+        val filteredItems = if (selectedTypes.isEmpty() && selectedTags.isEmpty()) {
+            ClothingItemsManager.getClothingItems()
+        } else {
+
+            Toast.makeText(requireContext(), "", Toast.LENGTH_SHORT).show()
+            ClothingItemsManager.getClothingItems().filter { item ->
+                val typeMatches = selectedTypes.isEmpty() || selectedTypes.contains(item.type.toInt())
+                val tagMatches = selectedTags.isEmpty() || item.tags.any { selectedTags.contains(it) }
+                typeMatches && tagMatches
+            }
+        }
+        wardobeLinearLayout.removeAllViews()
+        displayClothingItems(filteredItems)
     }
 
     fun displayClothingItems(clothingItems: List<ClothingItem>){
@@ -204,7 +258,7 @@ class WardrobeFragment : Fragment() {
             itemTypeParams.setMargins(0, 0, 20, 0)
             itemTypeTextView.textSize = 16f
             itemTypeTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-            itemTypeTextView.text = ClothingTypesManager.getTypeName(item.type.toInt())
+            itemTypeTextView.text = "${item.type} ${ClothingTypesManager.getTypeName(item.type.toInt())}"
             itemTypeTextView.background = ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.rounded_border
