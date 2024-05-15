@@ -21,6 +21,7 @@ import com.example.mywardrobe.managers.ClothingItemsManager
 import com.example.mywardrobe.managers.ClothingTagsManager
 import com.example.mywardrobe.managers.ClothingTypesManager
 import com.example.mywardrobe.managers.Tag
+import com.google.gson.Gson
 
 class WardrobeFragment : Fragment() {
 
@@ -219,7 +220,7 @@ class WardrobeFragment : Fragment() {
                 )
                 itemTagTextView.textSize = 16f
                 itemTagTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-                itemTagTextView.text = ClothingTagsManager.getTagName(tag.toInt())
+                itemTagTextView.text = "${tag} ${ClothingTagsManager.getTagName(tag.toInt())}"
                 itemTagTextView.background = ContextCompat.getDrawable(
                     requireContext(),
                     R.drawable.rounded_border
@@ -227,7 +228,21 @@ class WardrobeFragment : Fragment() {
                 itemTagTextView.setPadding(20, 10, 20, 10)
 
                 tagLinearLayout.addView(itemTagTextView)
+            }
 
+            outerLinearLayout.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putString("clothingItem", Gson().toJson(item))
+                }
+
+                val detailsFragment = ClothingItemDetailsFragment().apply {
+                    arguments = bundle
+                }
+
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentFrame, detailsFragment)
+                    .addToBackStack(null)
+                    .commit()
             }
 
             innerLinearLayout.addView(itemNameTextView)

@@ -13,14 +13,14 @@ import java.io.FileNotFoundException
 import java.io.InputStreamReader
 
 data class Tag(
-    val id: Number,
+    val id: Int,
     val name: String
 )
 
 object ClothingTagsManager {
     private val clothingTags = mutableListOf<Tag>()
 
-    fun generateId(): Number{
+    fun generateId(): Int{
         val lastId = clothingTags.lastOrNull()?.id as? Int ?: 0
         return lastId+1
     }
@@ -33,7 +33,7 @@ object ClothingTagsManager {
         return clothingTags
     }
 
-    fun getTagName(id: Number): String? {
+    fun getTagName(id: Int): String? {
         val tag = clothingTags.find { it.id == id }
         return tag?.name
     }

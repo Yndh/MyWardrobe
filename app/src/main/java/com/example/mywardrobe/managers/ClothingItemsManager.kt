@@ -34,6 +34,25 @@ object ClothingItemsManager {
         clothingItems.add(item)
     }
 
+    fun editClothingItem(item: ClothingItem): Boolean {
+        val index = clothingItems.indexOfFirst { it.id == item.id }
+        return if (index != -1) {
+            clothingItems.removeAt(index)
+            clothingItems.add(index, item)
+            true
+        } else {
+            false
+        }
+    }
+
+    fun removeClothingItem(item: ClothingItem){
+        clothingItems.removeAll { it == item }
+    }
+
+    fun clothingItemExists(item: ClothingItem): Boolean{
+        return clothingItems.any { it == item }
+    }
+
     fun getClothingItems(): List<ClothingItem>{
         return clothingItems.toList()
     }
