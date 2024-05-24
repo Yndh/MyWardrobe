@@ -33,10 +33,8 @@ class ClothingItemAdapter(
         if (convertView == null) {
             gridView = inflater.inflate(R.layout.grid_item_clothing, null)
             val imageView = gridView.findViewById<ImageView>(R.id.imageView)
-            val itemNameTextView = gridView.findViewById<TextView>(R.id.itemNameTextView)
             val item = clothingItems[position]
             imageView.setImageBitmap(ClothingItemsManager.getImage(context, item.imageName))
-            itemNameTextView.text = item.name
         } else {
             gridView = convertView
         }

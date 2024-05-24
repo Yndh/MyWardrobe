@@ -10,7 +10,13 @@
 
     <item
         android:id="@+id/action_create"
-        android:icon="@drawable/baseline_casino_24"
+        android:icon="@drawable/baseline_auto_awesome_24"
+        android:title=""
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/action_add"
+        android:icon="@drawable/camera_icon"
         android:title=""
         app:showAsAction="ifRoom"
         />
@@ -21,4 +27,11 @@
         android:title=""
         app:showAsAction="ifRoom"
         />
+    <item
+        android:id="@+id/action_outfits"
+        android:icon="@drawable/baseline_man_24"
+        android:title=""
+        app:showAsAction="ifRoom"
+        />
+    <!--placeholder-->
 </menu>

@@ -23,6 +23,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.setPadding
 import com.example.mywardrobe.R
 import com.example.mywardrobe.adapters.ClothingItemAdapter
 import com.example.mywardrobe.managers.ClothingItem
@@ -38,13 +39,10 @@ import com.google.gson.Gson
 private const val PREF_IS_LINEAR = "is_linear"
 
 class WardrobeFragment : Fragment() {
-
-    private lateinit var newClothingButton: ImageButton
     private lateinit var layoutTypeButton: ImageButton
     private lateinit var wardrobeScrollView: ScrollView
     private lateinit var wardobeLinearLayout: LinearLayout
     private lateinit var typesLinearLayout: LinearLayout
-    private lateinit var tagsLinearLayout: LinearLayout
 
     private val selectedTypes = mutableListOf<Int>()
     private val selectedTags = mutableListOf<Int>()
@@ -62,32 +60,25 @@ class WardrobeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        newClothingButton = view.findViewById(R.id.addNewClothingButton)
         layoutTypeButton = view.findViewById(R.id.layoutTypeButton)
         wardobeLinearLayout = view.findViewById(R.id.wardobeLinearLayout)
         wardrobeScrollView = view.findViewById(R.id.wardrobeScrollView)
         typesLinearLayout = view.findViewById(R.id.typesLinearLayout)
-        tagsLinearLayout = view.findViewById(R.id.tagsLinearLayout)
 
-        layoutTypeButton.setBackgroundResource(R.drawable.baseline_view_list_24)
 
         sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
         isLinear = sharedPreferences.getBoolean(PREF_IS_LINEAR, true)
+        if(isLinear) {
+            layoutTypeButton.setBackgroundResource(R.drawable.baseline_view_list_24)
+        }else{
+            layoutTypeButton.setBackgroundResource(R.drawable.baseline_grid_view_24)
 
+        }
         val clothingItems = ClothingItemsManager.getClothingItems()
         displayClothingItems(clothingItems)
         val clothingTypes = ClothingTypesManager.getTypes()
-        val clothingTags = ClothingTagsManager.getTags()
-        displayTypesAndTags(clothingTypes, clothingTags)
-
-        newClothingButton.setOnClickListener {
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentFrame, NewClothingFragment())
-                .addToBackStack(null)
-                .commit()
-        }
+        displayTypesAndTags(clothingTypes)
 
         layoutTypeButton.setOnClickListener {
             toggleLayout()
@@ -107,17 +98,17 @@ class WardrobeFragment : Fragment() {
         displayClothingItems(ClothingItemsManager.getClothingItems())
     }
 
-    fun displayTypesAndTags(types: List<String>, tags: List<Tag>){
+    fun displayTypesAndTags(types: List<String>){
         var typeCheckboxIdCounter = 1
         for(type in types){
             val checkbox = CheckBox(requireContext())
             val checkboxLayoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
-                90
+                LinearLayout.LayoutParams.WRAP_CONTENT
             ).also { checkbox.layoutParams = it }
             checkboxLayoutParams.setMargins(0, 0, 20, 0)
-            checkbox.setPadding(25, 15, 25, 15)
-            checkbox.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
+            checkbox.setPadding(50, 30, 50, 30)
+            checkbox.setTextColor(ContextCompat.getColor(requireContext(), R.color.checkboxAccent))
             checkbox.background = ContextCompat.getDrawable(requireContext(),
                 R.drawable.radio_border
             )
@@ -132,60 +123,18 @@ class WardrobeFragment : Fragment() {
             typesLinearLayout.addView(checkbox)
         }
 
-        for(tag in tags){
-            val checkbox = CheckBox(requireContext())
-            val checkboxLayoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                90
-            ).also { checkbox.layoutParams = it }
-            checkboxLayoutParams.setMargins(0, 0, 20, 0)
-            checkbox.setPadding(25, 15, 25, 15)
-            checkbox.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-            checkbox.background = ContextCompat.getDrawable(requireContext(),
-                R.drawable.radio_border
-            )
-            checkbox.buttonDrawable = null
-            checkbox.text = tag.name.toString()
-            checkbox.textSize = 14f
-            checkbox.setOnCheckedChangeListener { buttonView, isChecked ->
-                tagChecked(isChecked, tag.id)
-            }
-
-            tagsLinearLayout.addView(checkbox)
-        }
-
-        val button = Button(requireContext())
-        val buttonLayoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            90
-        ).also { button.layoutParams = it }
-        buttonLayoutParams.setMargins(10, 0, 20, 0)
-        button.setPadding(25, 15, 25, 15)
-        button.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-        button.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_border)
-        button.text = "Create New Tag"
-        button.isAllCaps = false
-        button.textSize = 14f
-        button.setTypeface(null, Typeface.BOLD)
-        button.setOnClickListener {
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentFrame, NewClothingTagFragment())
-                .addToBackStack(null)
-                .commit()
-        }
-
-        tagsLinearLayout.addView(button)
-
     }
 
     private fun typeChecked(buttonView: CompoundButton?, checked: Boolean) {
         if(checked){
             selectedTypes.add(buttonView?.id as Int)
+            buttonView.setTextColor(ContextCompat.getColor(requireContext(), R.color.fontSecondary))
             for (selectedType in selectedTypes) {
                 Log.d("WardobeFragment", "$selectedType")
             }
         }else{
             selectedTypes.remove(buttonView?.id as Int)
+            buttonView.setTextColor(ContextCompat.getColor(requireContext(), R.color.checkboxAccent))
         }
         filterClothingItems()
     }
@@ -300,7 +249,7 @@ class WardrobeFragment : Fragment() {
                 itemTypeParams.setMargins(0, 0, 20, 0)
                 itemTypeTextView.textSize = 16f
                 itemTypeTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-                itemTypeTextView.text = "${item.type} ${ClothingTypesManager.getTypeName(item.type.toInt())}"
+                itemTypeTextView.text = ClothingTypesManager.getTypeName(item.type.toInt())
                 itemTypeTextView.background = ContextCompat.getDrawable(
                     requireContext(),
                     R.drawable.rounded_border
@@ -316,7 +265,7 @@ class WardrobeFragment : Fragment() {
                     )
                     itemTagTextView.textSize = 16f
                     itemTagTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-                    itemTagTextView.text = "${tag} ${ClothingTagsManager.getTagName(tag.toInt())}"
+                    itemTagTextView.text = ClothingTagsManager.getTagName(tag.toInt())
                     itemTagTextView.background = ContextCompat.getDrawable(
                         requireContext(),
                         R.drawable.rounded_border
@@ -353,9 +302,9 @@ class WardrobeFragment : Fragment() {
             val wardrobeGridView = GridView(requireContext())
             val wardrobeLayoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                clothingItems.size*200
+                (clothingItems.size/2)*500
             ).also { wardrobeGridView.layoutParams = it }
-            wardrobeGridView.numColumns = 3
+            wardrobeGridView.numColumns = 2
             wardrobeLayoutParams.gravity = Gravity.CENTER
             wardrobeGridView.requestLayout()
 

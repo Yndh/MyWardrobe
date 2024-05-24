@@ -24,31 +24,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-<!--        Material toolbar-->
-<!--        <com.google.android.material.appbar.MaterialToolbar-->
-<!--            android:id="@+id/toolbar"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="80dp"-->
-<!--            android:background="@color/background"-->
-<!--            app:title="⠀"-->
-<!--            android:layout_gravity="center"-->
-<!--            app:menu="@menu/menu"-->
-<!--            />-->
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginVertical="20dp"
+        android:layout_marginHorizontal="30dp"
+        >
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/navigationView"
-            android:layout_width="290dp"
-            android:layout_height="80dp"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
             app:menu="@menu/menu"
-            android:layout_gravity="center"
-            app:itemIconSize="38dp"
-            android:background="@android:color/transparent"
-            app:itemIconTint="@color/font"
+            app:itemIconSize="32dp"
+            android:background="@drawable/navigation_background"
             app:itemActiveIndicatorStyle="@android:color/transparent"
-            app:itemRippleColor="@android:color/transparent"
-            />
+            app:itemRippleColor="@android:color/transparent" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

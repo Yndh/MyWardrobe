@@ -1,6 +1,7 @@
 package com.example.mywardrobe.ui
 
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -14,6 +15,7 @@ import com.example.mywardrobe.ui.fragments.HomeFragment
 import com.example.mywardrobe.R
 import com.example.mywardrobe.managers.OutfitManager
 import com.example.mywardrobe.ui.fragments.CreateFragment
+import com.example.mywardrobe.ui.fragments.NewClothingFragment
 import com.example.mywardrobe.ui.fragments.WardrobeFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -30,6 +32,7 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        
 
         ClothingItemsManager.loadClothingItems(applicationContext)
         ClothingTagsManager.loadClothingTags(applicationContext)
@@ -45,6 +48,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.action_create -> {
                     replaceFragment(CreateFragment())
+                    true
+                }
+                R.id.action_add -> {
+                    replaceFragment(NewClothingFragment())
                     true
                 }
                 R.id.action_wardrobe -> {

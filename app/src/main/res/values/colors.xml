@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background">#2a2b2b</color>
-    <color name="font">#fdfdfd</color>
+    <color name="background">#FFFFFF</color>
+    <color name="font">#101010</color>
+    <color name="fontSecondary">#FEFEFE</color>
     <color name="fontThin">#70fdfdfd</color>
     <color name="accent">#413f40</color>
     <color name="accentSecondary">#ffdcb4</color>
     <color name="errorColor">#c1392a</color>
+
+    <color name="backgroundBlack">#090809</color>
+    <color name="grey">#323030</color>
+    <color name="gradientGreen1">#E8F3CC</color>
+    <color name="gradientGreen2">#B8F967</color>
+    <color name="backdropColor">#F5F4F6</color>
+
+    <!-- Checkbox   -->
+    <color name="checkboxAccent">#99101010</color>
+
 </resources>
