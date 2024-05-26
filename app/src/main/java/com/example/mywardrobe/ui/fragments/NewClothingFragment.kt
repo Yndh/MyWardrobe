@@ -258,7 +258,7 @@ class NewClothingFragment : Fragment() {
             id = ClothingItemsManager.generateId(),
             imageName = imageName,
             tags = listOf(),
-            categories = listOf("")
+            categories = listOf(selectedCategories.keys.first())
         )
 
         val contex: Context = requireContext()
