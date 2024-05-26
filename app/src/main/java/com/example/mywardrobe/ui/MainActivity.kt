@@ -13,6 +13,7 @@ import com.example.mywardrobe.managers.ClothingItemsManager
 import com.example.mywardrobe.managers.ClothingTagsManager
 import com.example.mywardrobe.ui.fragments.HomeFragment
 import com.example.mywardrobe.R
+import com.example.mywardrobe.managers.ClothingCategoriesManager
 import com.example.mywardrobe.managers.OutfitManager
 import com.example.mywardrobe.ui.fragments.CreateFragment
 import com.example.mywardrobe.ui.fragments.NewClothingFragment
@@ -32,10 +33,11 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        
+
 
         ClothingItemsManager.loadClothingItems(applicationContext)
         ClothingTagsManager.loadClothingTags(applicationContext)
+        ClothingCategoriesManager.loadCategories(applicationContext)
         OutfitManager.loadOutfits(applicationContext)
 
         navigation = findViewById(R.id.navigationView)

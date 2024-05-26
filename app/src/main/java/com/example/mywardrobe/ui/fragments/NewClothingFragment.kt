@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
@@ -18,35 +17,44 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.setPadding
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.view.Gravity
 import android.view.ViewGroup
-import android.widget.CheckBox
+import android.widget.GridView
+import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isNotEmpty
+import androidx.transition.Visibility
 import com.example.mywardrobe.R
+import com.example.mywardrobe.adapters.SelectCategoriesAdapter
+import com.example.mywardrobe.managers.ClothingCategoriesManager
 import com.example.mywardrobe.managers.ClothingItem
 import com.example.mywardrobe.managers.ClothingItemsManager
-import com.example.mywardrobe.managers.ClothingTagsManager
-import com.example.mywardrobe.managers.ClothingTypesManager
-import com.example.mywardrobe.managers.Tag
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import kotlin.math.log
 
 
 class NewClothingFragment : Fragment() {
 
-    private lateinit var addImageButton: ImageButton
+    private lateinit var clothingImage: ImageView
+    private lateinit var addImage: LinearLayout
+    private lateinit var clothingImageLayout: LinearLayout
+    private lateinit var selectCategories: LinearLayout
     private lateinit var addClothingButton: AppCompatButton
     private lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
     private lateinit var pickedImageUri: Uri
     private lateinit var goBackImageButton: ImageButton
-    private lateinit var itemTypeRadioGroup: RadioGroup
+    private lateinit var categoriesHorizontalScrollView: HorizontalScrollView
+    private lateinit var categoriesLinearLayout: LinearLayout
+
+    private lateinit var selectedCategories:  MutableMap<String, MutableList<String>>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,28 +67,38 @@ class NewClothingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        addImageButton = view.findViewById(R.id.addImageButton)
+        clothingImage = view.findViewById(R.id.clothingImage)
+        addImage = view.findViewById(R.id.addImage)
+        clothingImageLayout = view.findViewById(R.id.clothingImageLayout)
+        selectCategories = view.findViewById(R.id.selectCategories)
         addClothingButton = view.findViewById(R.id.addClothingButton)
         goBackImageButton = view.findViewById(R.id.goBackImageButton)
-        itemTypeRadioGroup = view.findViewById(R.id.itemTypeRadioGroup)
+        categoriesHorizontalScrollView = view.findViewById(R.id.categoriesHorizontalScrollView)
+        categoriesLinearLayout = view.findViewById(R.id.categoriesLinearLayout)
 
-        val types = ClothingTypesManager.getTypes()
-        displayTagsAndTypes(types)
+        selectedCategories = mutableMapOf()
+
 
         pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
                 Log.d("PhotoPicker", "Selected URI: $uri")
-                addImageButton.setImageURI(uri)
-                addImageButton.setPadding(0)
-                addImageButton.scaleType = ImageView.ScaleType.CENTER_CROP
+                clothingImage.setImageURI(uri)
+                clothingImage.setPadding(0)
+                clothingImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
                 pickedImageUri = uri
+                clothingImageLayout.visibility = View.VISIBLE
+                addImage.visibility = View.GONE
             } else {
                 Log.d("NewClothingFragment", "No media selected")
             }
         }
 
-        addImageButton.setOnClickListener {
+        addImage.setOnClickListener {
             chooseImage()
+        }
+
+        selectCategories.setOnClickListener {
+            openModal()
         }
 
         addClothingButton.setOnClickListener {
@@ -92,29 +110,57 @@ class NewClothingFragment : Fragment() {
         }
     }
 
-    private fun displayTagsAndTypes(types: List<String>){
-        val inflater = LayoutInflater.from(requireContext())
-        var radioButtonIdCounter = 1
+    private fun openModal(){
+        val view: View = layoutInflater.inflate(R.layout.select_categories, null)
+        val dialog = BottomSheetDialog(requireContext())
+        dialog.setContentView(view)
+        dialog.show()
 
-        for(type in types){
-            val radioButton = RadioButton(requireContext())
-            val radioButtonLayoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                120
-            ).also { radioButton.layoutParams = it }
-            radioButtonLayoutParams.setMargins(0, 0, 20, 0)
-            radioButton.setPadding(25, 15, 25, 15)
-            radioButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-            radioButton.background = ContextCompat.getDrawable(requireContext(),
-                R.drawable.radio_border
-            )
-            radioButton.buttonDrawable = null
-            radioButton.text = type.toString()
-            radioButton.textSize = 14f
-            radioButton.id = radioButtonIdCounter++
-
-            itemTypeRadioGroup.addView(radioButton)
+        val close: ImageButton = view.findViewById(R.id.closeDialog)
+        close.setOnClickListener {
+            dialog.dismiss()
         }
+
+        val categoriesGrid: GridView = view.findViewById(R.id.categoriesGrid)
+        val categories = ClothingCategoriesManager.getCategories()
+        categoriesGrid.adapter = SelectCategoriesAdapter(requireContext(), categories, selectedCategories)
+
+        val saveCategories: AppCompatButton = view.findViewById(R.id.saveCategories)
+        saveCategories.setOnClickListener {
+            displayCategories()
+            dialog.dismiss()
+        }
+    }
+
+    private fun displayCategories(){
+        categoriesLinearLayout.removeAllViews()
+
+        val inflater = LayoutInflater.from(categoriesLinearLayout.context)
+
+        if(selectedCategories.isNotEmpty()){
+            selectCategories.visibility = View.GONE
+            categoriesHorizontalScrollView.visibility = View.VISIBLE
+        }else{
+            selectCategories.visibility = View.VISIBLE
+            categoriesHorizontalScrollView.visibility = View.GONE
+        }
+
+        for(category in selectedCategories){
+            val categoryView = inflater.inflate(R.layout.grid_item_category, categoriesLinearLayout, false)
+            val categoryTextView: TextView = categoryView.findViewById(R.id.categoryTextView)
+            categoryTextView.text = category.key
+
+            categoryView.setOnClickListener {
+                selectedCategories.clear()
+                displayCategories()
+            }
+
+            categoriesLinearLayout.addView(categoryView)
+        }
+
+        val openModalButton = inflater.inflate(R.layout.add_category_image_button, categoriesLinearLayout, false)
+        openModalButton.setOnClickListener { openModal() }
+        categoriesLinearLayout.addView(openModalButton)
     }
 
     private fun goBack(){
@@ -123,7 +169,6 @@ class NewClothingFragment : Fragment() {
     }
 
     private fun chooseImage(){
-        Log.d("!", "================")
         pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
@@ -146,20 +191,12 @@ class NewClothingFragment : Fragment() {
     }
 
     private fun addNewClothing(){
-        val title = "test"
-        val tags = mutableListOf<Int>()
-        val checkedRadio = itemTypeRadioGroup.checkedRadioButtonId
-
         if(!::pickedImageUri.isInitialized){
             Toast.makeText(requireContext(), "Please select an image", Toast.LENGTH_SHORT).show()
             return
         }
-        if(title.isEmpty()){
-            Toast.makeText(requireContext(), "Invalid title", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if(checkedRadio == -1){
-            Toast.makeText(requireContext(), "Select item type", Toast.LENGTH_SHORT).show()
+        if(selectedCategories.isEmpty()){
+            Toast.makeText(requireContext(), "Select category", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -170,9 +207,8 @@ class NewClothingFragment : Fragment() {
         val newClothingItem = ClothingItem(
             id = ClothingItemsManager.generateId(),
             imageName = imageName,
-            name = title,
-            type = checkedRadio,
-            tags = tags
+            tags = listOf(),
+            categories = listOf("")
         )
 
         ClothingItemsManager.addClothingItem(newClothingItem)
@@ -181,7 +217,7 @@ class NewClothingFragment : Fragment() {
             replace(R.id.fragmentFrame, WardrobeFragment())
             commit()
         }
-        Toast.makeText(requireContext(), "Clothing item added successfully", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Piece added successfully", Toast.LENGTH_SHORT).show()
 
         val clothingItemList = ClothingItemsManager.getClothingItems()
 

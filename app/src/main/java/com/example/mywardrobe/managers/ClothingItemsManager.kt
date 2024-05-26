@@ -17,9 +17,8 @@ import java.io.InputStreamReader
 data class ClothingItem(
     val id: Number,
     val imageName: String,
-    val name: String,
-    val type: Number,
-    val tags: List<Int>
+    val tags: List<Int>,
+    val categories: List<String>
 )
 
 object ClothingItemsManager {
@@ -55,6 +54,10 @@ object ClothingItemsManager {
 
     fun getClothingItems(): List<ClothingItem>{
         return clothingItems.toList()
+    }
+
+    fun getClothingTags(clothingItem: ClothingItem): List<String?> {
+        return clothingItem.tags.map { ClothingTagsManager.getTagName(it) }
     }
 
     fun getImage(context: Context, fileName: String): Bitmap? {

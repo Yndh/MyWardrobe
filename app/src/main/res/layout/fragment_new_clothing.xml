@@ -42,71 +42,139 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="20dp"
-            android:padding="20dp"
-            android:background="@drawable/dashed_border">
-
-            <ImageButton
-                android:id="@+id/addImageButton"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@drawable/baseline_image_search_24"
-                android:background="@drawable/gradient_rounded"
-                android:scaleType="centerCrop"
-                android:padding="20dp"
-                android:adjustViewBounds="true"
-                android:layout_gravity="center|center_horizontal"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add Picture"
-                android:layout_marginTop="10dp"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:textAlignment="center"
-                android:layout_gravity="center|center_horizontal"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Upload a photo of your clothing piece and watch as the background magically disappears!"
-                android:layout_marginVertical="10dp"
-                android:textSize="12sp"
-                android:textAlignment="center"
-                android:layout_gravity="center|center_horizontal"
-                />
-        </LinearLayout>
-
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Categories"
-            android:textSize="16sp"
-            android:textColor="@color/font"
-            android:layout_marginBottom="5dp"
-            />
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:layout_marginBottom="25dp"
-            android:scrollbars="none"
-            >
-            <RadioGroup
-                android:id="@+id/itemTypeRadioGroup"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/addImage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/dashed_border"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center|center_horizontal"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/gradient_rounded"
+                    android:padding="20dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/baseline_image_search_24" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:text="Add Picture"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|center_horizontal"
+                    android:layout_marginVertical="10dp"
+                    android:text="Upload a photo of your clothing piece and watch as the background magically disappears!"
+                    android:textAlignment="center"
+                    android:textSize="12sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/clothingImageLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/backdrop_background"
+                android:visibility="gone"
                 >
 
+                <ImageView
+                    android:id="@+id/clothingImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:src="@drawable/tylertee"
+                    android:scaleType="centerInside"
+                    android:adjustViewBounds="true"
+                    android:layout_gravity="center|center_horizontal"
+                    />
+            </LinearLayout>
 
-            </RadioGroup>
-        </HorizontalScrollView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Categories"
+                android:textSize="16sp"
+                android:textColor="@color/font"
+                android:layout_marginBottom="5dp"
+                />
+
+            <LinearLayout
+                android:id="@+id/selectCategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:padding="20dp"
+                android:background="@drawable/dashed_border"
+                >
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/round_add_box_24"
+                    android:background="@drawable/gradient_rounded"
+                    android:scaleType="centerCrop"
+                    android:padding="20dp"
+                    android:adjustViewBounds="true"
+                    android:layout_gravity="center|center_horizontal"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Categories"
+                    android:layout_marginTop="10dp"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textAlignment="center"
+                    android:layout_gravity="center|center_horizontal"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select categories of your clothing piece to categorize your item correctly."
+                    android:layout_marginVertical="10dp"
+                    android:textSize="12sp"
+                    android:textAlignment="center"
+                    android:layout_gravity="center|center_horizontal"
+                    />
+            </LinearLayout>
+
+            <HorizontalScrollView
+                android:id="@+id/categoriesHorizontalScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginBottom="25dp"
+                android:scrollbars="none"
+                android:visibility="gone"
+                >
+
+                <LinearLayout
+                    android:id="@+id/categoriesLinearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    >
+                </LinearLayout>
+            </HorizontalScrollView>
+        </LinearLayout>
 
 
 
