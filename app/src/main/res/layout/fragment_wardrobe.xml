@@ -74,9 +74,26 @@
                 android:id="@+id/wardobeLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
+                android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/noPiecesTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Looks like you don't have any pieces yet"
+                    android:textAlignment="center"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    />
+
+                <GridView
+                    android:id="@+id/wardobeGridView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:numColumns="2"
                 />
+            </LinearLayout>
 
         </ScrollView>
     </LinearLayout>

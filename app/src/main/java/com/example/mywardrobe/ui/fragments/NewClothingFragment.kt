@@ -17,6 +17,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.setPadding
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Typeface
 import android.view.ViewGroup
 import android.widget.GridView
 import android.widget.HorizontalScrollView
@@ -29,9 +30,12 @@ import androidx.core.view.isNotEmpty
 import androidx.transition.Visibility
 import com.example.mywardrobe.R
 import com.example.mywardrobe.adapters.SelectCategoriesAdapter
+import com.example.mywardrobe.adapters.SelectTagsAdapter
 import com.example.mywardrobe.managers.ClothingCategoriesManager
 import com.example.mywardrobe.managers.ClothingItem
 import com.example.mywardrobe.managers.ClothingItemsManager
+import com.example.mywardrobe.managers.ClothingTagsManager
+import com.example.mywardrobe.managers.Tag
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -55,6 +59,7 @@ class NewClothingFragment : Fragment() {
     private lateinit var categoriesLinearLayout: LinearLayout
 
     private lateinit var selectedCategories:  MutableMap<String, MutableList<String>>
+    private lateinit var selectedTags: MutableList<Tag>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,6 +82,7 @@ class NewClothingFragment : Fragment() {
         categoriesLinearLayout = view.findViewById(R.id.categoriesLinearLayout)
 
         selectedCategories = mutableMapOf()
+        selectedTags = mutableListOf()
 
 
         pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -111,24 +117,68 @@ class NewClothingFragment : Fragment() {
     }
 
     private fun openModal(){
+        var gridCategories = true
+
         val view: View = layoutInflater.inflate(R.layout.select_categories, null)
         val dialog = BottomSheetDialog(requireContext())
         dialog.setContentView(view)
         dialog.show()
+
+        var setCategoriesAppCompactButton: AppCompatButton = view.findViewById(R.id.setCategoriesAppCompactButton)
+        var setTagsAppCompactButton: AppCompatButton = view.findViewById(R.id.setTagsAppCompactButton)
+
+        setCategoriesAppCompactButton.setOnClickListener {
+            gridCategories = true
+            displayModalGrids(view, gridCategories)
+            setCategoriesAppCompactButton.setTypeface(null, Typeface.BOLD)
+            setTagsAppCompactButton.setTypeface(null, Typeface.NORMAL)
+        }
+        setTagsAppCompactButton.setOnClickListener {
+            gridCategories = false
+            displayModalGrids(view, gridCategories)
+            setCategoriesAppCompactButton.setTypeface(null, Typeface.NORMAL)
+            setTagsAppCompactButton.setTypeface(null, Typeface.BOLD)
+        }
+
+        displayModalGrids(view, gridCategories)
 
         val close: ImageButton = view.findViewById(R.id.closeDialog)
         close.setOnClickListener {
             dialog.dismiss()
         }
 
-        val categoriesGrid: GridView = view.findViewById(R.id.categoriesGrid)
-        val categories = ClothingCategoriesManager.getCategories()
-        categoriesGrid.adapter = SelectCategoriesAdapter(requireContext(), categories, selectedCategories)
 
         val saveCategories: AppCompatButton = view.findViewById(R.id.saveCategories)
         saveCategories.setOnClickListener {
             displayCategories()
             dialog.dismiss()
+        }
+    }
+
+    private fun displayModalGrids(view: View, gridCategories: Boolean){
+        val categoriesGrid: GridView = view.findViewById(R.id.categoriesGrid)
+        val tagsGrid: GridView = view.findViewById(R.id.tagsGrid)
+        val noTagsLinearLayout: LinearLayout = view.findViewById(R.id.noTagsLinearLayout)
+        if(gridCategories) {
+            tagsGrid.visibility = View.GONE
+            categoriesGrid.visibility = View.VISIBLE
+            noTagsLinearLayout.visibility = View.GONE
+            val categories = ClothingCategoriesManager.getCategories()
+            categoriesGrid.adapter =
+                SelectCategoriesAdapter(requireContext(), categories, selectedCategories)
+
+        }else{
+            tagsGrid.visibility = View.VISIBLE
+            categoriesGrid.visibility = View.GONE
+            val tags = ClothingTagsManager.getTags()
+
+            if(tags.isNotEmpty()){
+                tagsGrid.adapter = SelectTagsAdapter(requireContext(), tags, selectedTags)
+                return
+            }
+
+            tagsGrid.visibility = View.GONE
+            noTagsLinearLayout.visibility = View.VISIBLE
         }
     }
 
@@ -211,6 +261,8 @@ class NewClothingFragment : Fragment() {
             categories = listOf("")
         )
 
+        val contex: Context = requireContext()
+
         ClothingItemsManager.addClothingItem(newClothingItem)
         val fragmentManager = requireActivity().supportFragmentManager
         fragmentManager.beginTransaction().apply {
@@ -222,14 +274,14 @@ class NewClothingFragment : Fragment() {
         val clothingItemList = ClothingItemsManager.getClothingItems()
 
         GlobalScope.launch(Dispatchers.Main) {
-            val imageResult = ClothingItemsManager.saveImage(requireContext(), imageName, imageByteArray)
+            val imageResult = ClothingItemsManager.saveImage(contex, imageName, imageByteArray)
             if(imageResult){
                 Log.d("NewClothingFragment", "Image file saved")
             } else {
                 Toast.makeText(requireContext(), "Failed to save image", Toast.LENGTH_SHORT).show()
             }
 
-            val dataResult = ClothingItemsManager.saveClothingItems(requireContext(), clothingItemList)
+            val dataResult = ClothingItemsManager.saveClothingItems(contex, clothingItemList)
             if(dataResult){
                 Log.d("NewClothingFragment", "Clothing item file saved")
             } else {
