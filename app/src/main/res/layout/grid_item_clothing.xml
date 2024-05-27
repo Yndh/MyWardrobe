@@ -6,14 +6,21 @@
     android:background="@color/background"
     >
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:padding="20dp"
-        android:scaleType="centerInside"
-        android:adjustViewBounds="true"
-        android:layout_gravity="center"/>
+    <LinearLayout
+        android:layout_width="210dp"
+        android:layout_height="210dp"
+        android:padding="10dp"
+        android:layout_gravity="center"
+        >
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:scaleType="centerInside"
+            android:adjustViewBounds="true"
+
+            android:background="@drawable/backdrop_background"/>
+    </LinearLayout>
 
 
 </LinearLayout>

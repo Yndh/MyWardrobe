@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bottom_sheet_background"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:orientation="vertical"
+        android:background="@drawable/backdrop_background"
+        android:padding="10dp"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+            <ImageButton
+                android:id="@+id/closeDialog"
+                android:layout_width="25dp"
+                android:layout_height="26dp"
+                android:padding="3dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/baseline_close_24"
+                android:background="@drawable/secondary_backdrop_background"
+                />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Piece details"
+                android:textStyle="bold"
+                android:textColor="@color/font"
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                />
+            <ImageButton
+                android:id="@+id/optionsDialog"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:padding="3dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/baseline_more_vert_24"
+                android:background="@drawable/secondary_backdrop_background"/>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/clothingItemImageView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:layout_marginTop="20dp"
+            />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="10dp"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Categories"
+                android:textSize="16sp"
+                android:textColor="@color/font"
+                android:layout_marginBottom="5dp"
+                />
+
+            <TextView
+                android:id="@+id/errorTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="There was an error loading categories"
+                android:visibility="gone"
+                />
+
+            <HorizontalScrollView
+                android:id="@+id/categoriesHorizontalScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginBottom="25dp"
+                android:scrollbars="none"
+                >
+
+                <LinearLayout
+                    android:id="@+id/categoriesLinearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    >
+
+                </LinearLayout>
+            </HorizontalScrollView>
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/saveCategories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_border"
+            android:text="Generate Outfit"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="@color/fontSecondary"
+            />
+    </LinearLayout>
+</LinearLayout>

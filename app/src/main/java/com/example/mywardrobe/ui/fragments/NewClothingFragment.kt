@@ -61,6 +61,8 @@ class NewClothingFragment : Fragment() {
     private lateinit var selectedCategories:  MutableMap<String, MutableList<String>>
     private lateinit var selectedTags: MutableList<Tag>
 
+    private var bottomSheetDialog: BottomSheetDialog? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -117,15 +119,19 @@ class NewClothingFragment : Fragment() {
     }
 
     private fun openModal(){
+        if(bottomSheetDialog != null && bottomSheetDialog!!.isShowing){
+            return
+        }
+
         var gridCategories = true
 
         val view: View = layoutInflater.inflate(R.layout.select_categories, null)
-        val dialog = BottomSheetDialog(requireContext())
-        dialog.setContentView(view)
-        dialog.show()
+        bottomSheetDialog = BottomSheetDialog(requireContext())
+        bottomSheetDialog?.setContentView(view)
+        bottomSheetDialog?.show()
 
-        var setCategoriesAppCompactButton: AppCompatButton = view.findViewById(R.id.setCategoriesAppCompactButton)
-        var setTagsAppCompactButton: AppCompatButton = view.findViewById(R.id.setTagsAppCompactButton)
+        val setCategoriesAppCompactButton: AppCompatButton = view.findViewById(R.id.setCategoriesAppCompactButton)
+        val setTagsAppCompactButton: AppCompatButton = view.findViewById(R.id.setTagsAppCompactButton)
 
         setCategoriesAppCompactButton.setOnClickListener {
             gridCategories = true
@@ -144,14 +150,14 @@ class NewClothingFragment : Fragment() {
 
         val close: ImageButton = view.findViewById(R.id.closeDialog)
         close.setOnClickListener {
-            dialog.dismiss()
+            bottomSheetDialog?.dismiss()
         }
 
 
         val saveCategories: AppCompatButton = view.findViewById(R.id.saveCategories)
         saveCategories.setOnClickListener {
             displayCategories()
-            dialog.dismiss()
+            bottomSheetDialog?.dismiss()
         }
     }
 
