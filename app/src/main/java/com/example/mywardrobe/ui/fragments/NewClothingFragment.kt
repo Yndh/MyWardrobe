@@ -59,6 +59,7 @@ class NewClothingFragment : Fragment() {
     private lateinit var categoriesLinearLayout: LinearLayout
 
     private lateinit var selectedCategories:  MutableMap<String, MutableList<String>>
+    private var selectedCategoriesType: String? = null
     private lateinit var selectedTags: MutableList<Tag>
 
     private var bottomSheetDialog: BottomSheetDialog? = null
@@ -171,7 +172,7 @@ class NewClothingFragment : Fragment() {
             noTagsLinearLayout.visibility = View.GONE
             val categories = ClothingCategoriesManager.getCategories()
             categoriesGrid.adapter =
-                SelectCategoriesAdapter(requireContext(), categories, selectedCategories)
+                SelectCategoriesAdapter(requireContext(), categories, selectedCategories, selectedCategoriesType)
 
         }else{
             tagsGrid.visibility = View.VISIBLE
@@ -196,9 +197,11 @@ class NewClothingFragment : Fragment() {
         if(selectedCategories.isNotEmpty()){
             selectCategories.visibility = View.GONE
             categoriesHorizontalScrollView.visibility = View.VISIBLE
-        }else{
+            selectedCategoriesType = selectedCategories.values.firstOrNull()?.firstOrNull()
+         }else{
             selectCategories.visibility = View.VISIBLE
             categoriesHorizontalScrollView.visibility = View.GONE
+            selectedCategoriesType = null
         }
 
         for(category in selectedCategories){
@@ -255,6 +258,10 @@ class NewClothingFragment : Fragment() {
             Toast.makeText(requireContext(), "Select category", Toast.LENGTH_SHORT).show()
             return
         }
+        if(selectedCategoriesType.isNullOrEmpty()){
+            Toast.makeText(requireContext(), "Select category", Toast.LENGTH_SHORT).show()
+            return
+        }
 
 
         val imageByteArray = convertImageToByteArray(requireContext(), pickedImageUri)
@@ -264,6 +271,7 @@ class NewClothingFragment : Fragment() {
             id = ClothingItemsManager.generateId(),
             imageName = imageName,
             tags = listOf(),
+            type = selectedCategoriesType as String,
             categories = listOf(selectedCategories.keys.first())
         )
 

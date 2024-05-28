@@ -17,7 +17,6 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:scaleType="centerInside"
-            android:adjustViewBounds="true"
 
             android:background="@drawable/backdrop_background"/>
     </LinearLayout>

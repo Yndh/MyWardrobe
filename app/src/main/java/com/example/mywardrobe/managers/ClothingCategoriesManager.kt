@@ -13,6 +13,8 @@ import java.io.FileNotFoundException
 import java.io.InputStreamReader
 
 object ClothingCategoriesManager {
+    private val types = listOf("Headwear", "Tops", "Bottoms", "Footwear", "Accessories")
+
     private val categories = mutableMapOf(
         "Caps" to listOf("Headwear"),
         "Beanies" to listOf("Headwear"),
@@ -41,6 +43,10 @@ object ClothingCategoriesManager {
 
     fun getTypes(category: String): List<String> {
         return categories[category] ?: emptyList()
+    }
+
+    fun getAllTypes(): List<String> {
+        return types
     }
 
     fun addCategory(category: String, types: List<String>) {

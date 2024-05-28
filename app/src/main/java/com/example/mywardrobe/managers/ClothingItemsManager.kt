@@ -18,6 +18,7 @@ data class ClothingItem(
     val id: Number,
     val imageName: String,
     val tags: List<Int>,
+    val type: String,
     val categories: List<String>
 )
 
