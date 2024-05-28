@@ -1,10 +1,6 @@
 package com.example.mywardrobe.ui.fragments
 
-import android.content.Context
-import android.graphics.Typeface
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorManager
+
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -12,27 +8,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.CheckBox
-import android.widget.CompoundButton
 import android.widget.HorizontalScrollView
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
-import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.mywardrobe.R
 import com.example.mywardrobe.managers.ClothingItem
 import com.example.mywardrobe.managers.ClothingItemsManager
-import com.example.mywardrobe.managers.ClothingTagsManager
 import com.example.mywardrobe.managers.ClothingCategoriesManager
 import com.example.mywardrobe.managers.Outfit
 import com.example.mywardrobe.managers.OutfitManager
-import com.example.mywardrobe.managers.Tag
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -207,7 +197,7 @@ class CreateFragment : Fragment() {
             if (selectedTypes.contains(type) && sortedOutfit.containsKey(type)) {
                 val item = sortedOutfit[type]
                 itemImageView.setImageBitmap(ClothingItemsManager.getImage(requireContext(), item?.imageName as String))
-                itemImageView.scaleType = ImageView.ScaleType.CENTER_CROP
+                itemImageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
                 outfitLinearLayout.addView(itemImageView)
             } else {
                 if (selectedTypes.contains(type)) {

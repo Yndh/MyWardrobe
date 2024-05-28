@@ -17,6 +17,7 @@ import com.example.mywardrobe.managers.ClothingCategoriesManager
 import com.example.mywardrobe.managers.OutfitManager
 import com.example.mywardrobe.ui.fragments.CreateFragment
 import com.example.mywardrobe.ui.fragments.NewClothingFragment
+import com.example.mywardrobe.ui.fragments.OutfitsFragment
 import com.example.mywardrobe.ui.fragments.WardrobeFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -58,6 +59,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.action_wardrobe -> {
                     replaceFragment(WardrobeFragment())
+                    true
+                }
+                R.id.action_outfits -> {
+                    replaceFragment(OutfitsFragment())
                     true
                 }
                 else -> false

@@ -7,15 +7,15 @@
     >
 
     <LinearLayout
-        android:layout_width="210dp"
-        android:layout_height="210dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:padding="10dp"
         android:layout_gravity="center"
         >
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:scaleType="centerInside"
 
             android:background="@drawable/backdrop_background"/>

@@ -22,12 +22,7 @@ import android.view.ViewGroup
 import android.widget.GridView
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.core.view.isNotEmpty
-import androidx.transition.Visibility
 import com.example.mywardrobe.R
 import com.example.mywardrobe.adapters.SelectCategoriesAdapter
 import com.example.mywardrobe.adapters.SelectTagsAdapter
@@ -42,7 +37,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import kotlin.math.log
 
 
 class NewClothingFragment : Fragment() {
@@ -275,7 +269,7 @@ class NewClothingFragment : Fragment() {
             categories = listOf(selectedCategories.keys.first())
         )
 
-        val contex: Context = requireContext()
+        val context: Context = requireContext()
 
         ClothingItemsManager.addClothingItem(newClothingItem)
         val fragmentManager = requireActivity().supportFragmentManager
@@ -288,14 +282,14 @@ class NewClothingFragment : Fragment() {
         val clothingItemList = ClothingItemsManager.getClothingItems()
 
         GlobalScope.launch(Dispatchers.Main) {
-            val imageResult = ClothingItemsManager.saveImage(contex, imageName, imageByteArray)
+            val imageResult = ClothingItemsManager.saveImage(context, imageName, imageByteArray)
             if(imageResult){
                 Log.d("NewClothingFragment", "Image file saved")
             } else {
                 Toast.makeText(requireContext(), "Failed to save image", Toast.LENGTH_SHORT).show()
             }
 
-            val dataResult = ClothingItemsManager.saveClothingItems(contex, clothingItemList)
+            val dataResult = ClothingItemsManager.saveClothingItems(context, clothingItemList)
             if(dataResult){
                 Log.d("NewClothingFragment", "Clothing item file saved")
             } else {

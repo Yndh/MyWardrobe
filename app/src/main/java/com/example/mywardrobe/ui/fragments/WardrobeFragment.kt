@@ -120,7 +120,6 @@ class WardrobeFragment : Fragment() {
             wardrobeRecyclerView.visibility = View.GONE
             return
         }
-        Log.d("WardrobeFragment", "${wardrobeRecyclerView.height}x${wardrobeRecyclerView.width}")
         noPiecesTextView.visibility = View.GONE
         wardrobeRecyclerView.visibility = View.VISIBLE
         clothingItemAdapter.updateItems(clothingItems)
