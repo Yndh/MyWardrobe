@@ -5,18 +5,20 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.HorizontalScrollView
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.ImageView.ScaleType
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mywardrobe.R
-import com.example.mywardrobe.adapters.ClothingItemAdapter
 import com.example.mywardrobe.adapters.OutfitsAdapter
-import com.example.mywardrobe.managers.ClothingCategoriesManager
 import com.example.mywardrobe.managers.ClothingItemsManager
 import com.example.mywardrobe.managers.Outfit
 import com.example.mywardrobe.managers.OutfitManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +65,6 @@ class OutfitsFragment : Fragment() {
             outfitsRecyclerView.visibility = View.GONE
             return
         }
-        Toast.makeText(requireContext(), "${outfitsRecyclerView.height}", Toast.LENGTH_SHORT).show()
 
         noOutfitsTextView.visibility = View.GONE
         outfitsRecyclerView.visibility = View.VISIBLE
@@ -73,6 +74,60 @@ class OutfitsFragment : Fragment() {
     private fun displayDetails(outfit: Outfit){
         if (bottomSheetDialog != null && bottomSheetDialog!!.isShowing) {
             return
+        }
+
+        val view: View = layoutInflater.inflate(R.layout.outfit_details, null)
+        bottomSheetDialog = BottomSheetDialog(requireContext()).apply {
+            setContentView(view)
+            delegate.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.let { bottomSheet ->
+                BottomSheetBehavior.from(bottomSheet).state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
+
+        bottomSheetDialog?.show()
+
+        val outfitContainerLinearLayout: LinearLayout = view.findViewById(R.id.outfitContainerLinearLayout)
+        val outfitItemsHorizontalScrollView: HorizontalScrollView = view.findViewById(R.id.outfitItemsHorizontalScrollView)
+        val outfitItemsLinearLayout: LinearLayout = view.findViewById(R.id.outfitItemsLinearLayout)
+        val closeDialog: ImageButton = view.findViewById(R.id.closeDialog)
+        val errorTextView: TextView = view.findViewById(R.id.errorTextView)
+
+        val inflater = LayoutInflater.from(outfitItemsLinearLayout.context)
+        outfitItemsLinearLayout.removeAllViews()
+
+        if(outfit.items.isNotEmpty()){
+            errorTextView.visibility = View.GONE
+            outfitItemsHorizontalScrollView.visibility = View.VISIBLE
+
+            for (item in outfit.items){
+                // Display Outfit
+                val outfitItemImageView = ImageView(requireContext()).apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        300,
+                        300
+                    )
+                    scaleType = ScaleType.CENTER_INSIDE
+                    setImageBitmap(ClothingItemsManager.getImage(requireContext(), item.imageName))
+
+                }
+                outfitContainerLinearLayout.addView(outfitItemImageView)
+
+
+                // Includes
+                val outfitView = inflater.inflate(R.layout.grid_item_category, outfitItemsLinearLayout, false)
+                val categoryTextView: TextView = outfitView.findViewById(R.id.categoryTextView)
+                val categoryImage: ImageView = outfitView.findViewById(R.id.categoryImage)
+                categoryTextView.text = item.type
+                categoryImage.setImageBitmap(ClothingItemsManager.getImage(requireContext(), item.imageName))
+                outfitItemsLinearLayout.addView(outfitView)
+            }
+        } else {
+            errorTextView.visibility = View.VISIBLE
+            outfitItemsHorizontalScrollView.visibility = View.GONE
+        }
+
+        closeDialog.setOnClickListener {
+            bottomSheetDialog?.dismiss()
         }
     }
 

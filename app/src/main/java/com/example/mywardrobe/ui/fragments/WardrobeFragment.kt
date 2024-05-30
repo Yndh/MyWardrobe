@@ -145,12 +145,7 @@ class WardrobeFragment : Fragment() {
         val errorTextView: TextView = view.findViewById(R.id.errorTextView)
         val closeDialog: ImageButton = view.findViewById(R.id.closeDialog)
 
-        CoroutineScope(Dispatchers.Main).launch {
-            val bitmap = withContext(Dispatchers.IO) {
-                ClothingItemsManager.getImage(requireContext(), item.imageName)
-            }
-            clothingItemImageView.setImageBitmap(bitmap)
-        }
+        clothingItemImageView.setImageBitmap(ClothingItemsManager.getImage(requireContext(), item.imageName))
 
         val inflater = LayoutInflater.from(categoriesLinearLayout.context)
         categoriesLinearLayout.removeAllViews()

@@ -14,11 +14,13 @@
         android:title=""
         app:showAsAction="ifRoom"
         />
+
     <item
         android:id="@+id/action_add"
         android:icon="@drawable/camera_icon"
         android:title=""
         app:showAsAction="ifRoom"
+        android:iconTintMode="multiply"
         />
 
     <item

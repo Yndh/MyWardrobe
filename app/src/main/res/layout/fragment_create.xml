@@ -17,7 +17,8 @@
             android:orientation="vertical"
             android:background="@drawable/gradient_background"
             android:paddingHorizontal="25dp"
-            android:paddingVertical="15dp">
+            android:paddingBottom="15dp"
+            android:paddingTop="20dp">
 
             <TextView
                 android:layout_width="match_parent"
@@ -25,6 +26,7 @@
                 android:gravity="center"
                 android:letterSpacing=".05"
                 android:text="Outfit Styling"
+                android:fontFamily="@font/poppins_bold"
                 android:textColor="@color/font"
                 android:textSize="26sp"
                 android:textStyle="bold" />
