@@ -33,21 +33,19 @@
                 android:textSize="28sp"
                 android:textStyle="bold" />
 
-
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:layout_marginBottom="10dp"
                 android:scrollbars="none"
                 >
-                <LinearLayout
-                    android:id="@+id/categoriesLinearLayout"
+                <RadioGroup
+                    android:id="@+id/categoriesRadioGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
 
-                </LinearLayout>
+                </RadioGroup>
             </HorizontalScrollView>
         </LinearLayout>
 
@@ -57,32 +55,15 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:scrollbars="none"
-            android:padding="25dp"
+            android:paddingVertical="25dp"
+            android:paddingHorizontal="10dp"
             >
 
             <LinearLayout
-                android:id="@+id/wardobeLinearLayout"
+                android:id="@+id/wardrobeContainerLinearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/wardrobeRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    />
-
-                <TextView
-                    android:id="@+id/noPiecesTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Looks like you don't have any pieces yet"
-                    android:textAlignment="center"
-                    android:textSize="14sp"
-                    android:visibility="gone"
-                    />
             </LinearLayout>
 
         </ScrollView>
