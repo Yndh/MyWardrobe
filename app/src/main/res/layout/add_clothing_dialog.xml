@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:background="@drawable/bottom_sheet_background"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <ImageButton
+            android:id="@+id/closeDialog"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
+            android:src="@drawable/baseline_close_24"
+            android:background="@android:color/transparent"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Upload new piece"
+            android:textStyle="bold"
+            android:textColor="@color/font"
+
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:layout_marginRight="23dp"
+            />
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:layout_marginVertical="40dp"
+        >
+        <LinearLayout
+            android:id="@+id/takePhotoLinearLayout"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:gravity="center"
+            android:padding="10dp"
+            android:background="@drawable/choice_background"
+            android:orientation="vertical"
+            android:layout_marginRight="50dp"
+            >
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="8dp"
+                android:src="@drawable/baseline_camera_alt_24"
+                android:background="@drawable/gradient_rounded"
+                android:layout_marginBottom="5dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Take photo"
+                android:textColor="@color/font"
+                android:textAlignment="center"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/uploadPhotoLinearLayout"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:gravity="center"
+            android:padding="10dp"
+            android:background="@drawable/choice_background"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="8dp"
+                android:src="@drawable/baseline_camera_alt_24"
+                android:background="@drawable/gradient_rounded"
+                android:layout_marginBottom="5dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upload photo"
+                android:textAlignment="center"
+                android:textColor="@color/font"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

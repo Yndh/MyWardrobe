@@ -1,12 +1,9 @@
 package com.example.mywardrobe.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.CompoundButton
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -45,6 +42,7 @@ class WardrobeFragment : Fragment() {
 
     private var bottomSheetDialog: BottomSheetDialog? = null
     private var selectedCategory: String? = null
+    private var isScrolling = false
 
 
 
@@ -63,12 +61,11 @@ class WardrobeFragment : Fragment() {
 
         clothingItemAdapters = mutableMapOf()
 
-        CoroutineScope(Dispatchers.Main).launch {
-            val clothingItems = withContext(Dispatchers.IO) { ClothingItemsManager.getClothingItems() }
-            val categories = withContext(Dispatchers.IO) { ClothingCategoriesManager.getCategories() }
-            displayCategories(categories, clothingItems)
-            displayClothingItems(clothingItems)
-        }
+        val clothingItems = ClothingItemsManager.getClothingItems()
+        val categories = ClothingCategoriesManager.getCategories()
+        displayCategories(categories, clothingItems)
+        displayClothingItems(clothingItems)
+
 
         wardrobeScrollView.viewTreeObserver.addOnScrollChangedListener {
             onScrollChanged()
@@ -117,36 +114,47 @@ class WardrobeFragment : Fragment() {
     }
 
     private fun scrollToCategory(category: String) {
+        isScrolling = true
         val targetView = viewHolders[category]
-        targetView?.let {
+        targetView?.let { target ->
+            wardrobeScrollView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
+                if (scrollY == target.top || scrollY == oldScrollY) {
+                    isScrolling = false
+                    wardrobeScrollView.setOnScrollChangeListener(null)
+                }
+            }
             wardrobeScrollView.post {
-                wardrobeScrollView.smoothScrollTo(0, it.top)
+                wardrobeScrollView.smoothScrollTo(0, target.top)
             }
         }
     }
 
+
     private fun onScrollChanged() {
-        val scrollY = wardrobeScrollView.scrollY
-        var closestCategory: String? = null
-        var closestDistance = Int.MAX_VALUE
+        if(!isScrolling){
+            val scrollY = wardrobeScrollView.scrollY
+            var closestCategory: String? = null
+            var closestDistance = Int.MAX_VALUE
 
 
-        for ((category, view) in viewHolders) {
-            val categoryTop = view.top
-            val categoryBottom = view.bottom
-            if (categoryTop <= wardrobeScrollView.height && categoryBottom >= 0) {
-                val distance = min(abs(categoryTop - scrollY), abs(categoryBottom - scrollY))
-                if (distance < closestDistance) {
-                    closestCategory = category
-                    closestDistance = distance
+            for ((category, view) in viewHolders) {
+                val categoryTop = view.top
+                val categoryBottom = view.bottom
+                if (categoryTop <= wardrobeScrollView.height && categoryBottom >= 0) {
+                    val distance = min(abs(categoryTop - scrollY), abs(categoryBottom - scrollY))
+                    if (distance < closestDistance) {
+                        closestCategory = category
+                        closestDistance = distance
+                    }
                 }
             }
-        }
 
-        closestCategory?.let {
-            if (it != selectedCategory) {
-                selectedCategory = it
-                categoriesRadioGroup.findViewWithTag<RadioButton>(it)?.isChecked = true
+            closestCategory?.let {
+                if (it != selectedCategory) {
+                    selectedCategory = it
+                    categoriesRadioGroup.findViewWithTag<RadioButton>(it)?.isChecked = true
+                    Toast.makeText(requireContext(), "$selectedCategory", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -173,7 +181,7 @@ class WardrobeFragment : Fragment() {
                 textSize = 16f
                 typeface = ResourcesCompat.getFont(requireContext(), R.font.poppins_medium)
                 setTextColor(ContextCompat.getColor(requireContext(), R.color.font))
-                setPadding(16, 16, 16, 16)
+                setPadding(16, 16, 16, 10)
             }
 
             val recyclerView = RecyclerView(requireContext()).apply {
@@ -182,6 +190,7 @@ class WardrobeFragment : Fragment() {
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
                 layoutManager = GridLayoutManager(requireContext(), 2)
+                setPadding(0, 0, 0, 20)
             }
 
             val adapter = ClothingItemAdapter(requireContext(), items) { item -> displayDetails(item) }
@@ -196,6 +205,9 @@ class WardrobeFragment : Fragment() {
                 orientation = LinearLayout.VERTICAL
                 addView(categoryTextView)
                 addView(recyclerView)
+                if(categoryOrder.last() == category){
+                    minimumHeight = 1700
+                }
             }
 
             wardrobeContainerLinearLayout.addView(container)

@@ -3,8 +3,6 @@
     <solid android:color="@color/backdropColor" />
     <corners android:radius="10dp" />
     <stroke
-        android:width="1dp"
-        android:color="@color/backdropSecondaryColor"
-        android:dashWidth="8dp"
-        android:dashGap="4dp" />
+        android:width="2dp"
+        android:color="@color/borderAccent" />
 </shape>

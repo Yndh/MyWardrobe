@@ -19,6 +19,8 @@
 
     <!-- Checkbox   -->
     <color name="checkboxAccent">#99101010</color>
+    <color name="borderAccent">#10101033</color>
+
 
 
 </resources>

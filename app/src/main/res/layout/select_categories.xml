@@ -113,7 +113,7 @@
                         android:layout_height="30dp"
                         android:layout_width="30dp"
                         android:src="@drawable/round_add_box_24"
-                        android:background="@drawable/gradient_rounded"
+                        android:background="@drawable/gradient_oval"
                         android:padding="5dp"
                         android:layout_marginRight="10dp"
                         />
