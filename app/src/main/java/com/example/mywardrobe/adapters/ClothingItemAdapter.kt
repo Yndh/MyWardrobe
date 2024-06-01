@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.mywardrobe.R
 import com.example.mywardrobe.managers.ClothingItem
 import com.example.mywardrobe.managers.ClothingItemsManager
@@ -40,13 +41,13 @@ class ClothingItemAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = clothingItems[position]
-        CoroutineScope(Dispatchers.Main).launch {
-            val bitmap = withContext(Dispatchers.IO) {
-                ClothingItemsManager.getImage(context, item.imageName)
-            }
-            holder.imageView.setImageBitmap(bitmap)
-        }
-    }
+
+        CoroutineScope(Dispatchers.Main)
+            .launch {
+                Glide.with(context)
+                    .load(ClothingItemsManager.getImage(context, item.imageName))
+                    .into(holder.imageView)
+            }    }
 
     override fun getItemCount(): Int = clothingItems.size
 

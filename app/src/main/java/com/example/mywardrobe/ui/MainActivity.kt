@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
                 .commit()
         }
     }
-    
+
 
     private fun replaceFragment(fragment: Fragment) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()

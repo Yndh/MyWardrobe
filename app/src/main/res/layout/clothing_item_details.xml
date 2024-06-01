@@ -111,16 +111,5 @@
                 </LinearLayout>
             </HorizontalScrollView>
         </LinearLayout>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/saveCategories"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rounded_border"
-            android:text="Generate Outfit"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textColor="@color/fontSecondary"
-            />
     </LinearLayout>
 </LinearLayout>

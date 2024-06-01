@@ -16,8 +16,13 @@ import android.widget.LinearLayout.LayoutParams
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mywardrobe.R
+import com.example.mywardrobe.adapters.StylingItemsAdapter
 import com.example.mywardrobe.managers.ClothingItem
 import com.example.mywardrobe.managers.ClothingItemsManager
 import com.example.mywardrobe.managers.ClothingCategoriesManager
@@ -61,6 +66,7 @@ class CreateFragment : Fragment() {
         outfit = mutableMapOf()
         selectedTypes = mutableListOf("Tops", "Bottoms", "Footwear")
 
+        populateRecyclerViews()
 
         val selectedOutfitJson = arguments?.getString("outfit")
         if(selectedOutfitJson != null){
@@ -152,6 +158,32 @@ class CreateFragment : Fragment() {
 
     }
 
+    private fun populateRecyclerViews() {
+        val itemTypes = ClothingCategoriesManager.getAllTypes()
+        val clothingItems = ClothingItemsManager.getClothingItems()
+
+        for (type in itemTypes) {
+            val typeItems = clothingItems.filter { it.type == type }
+
+            val recyclerView = RecyclerView(requireContext()).apply {
+                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                adapter = StylingItemsAdapter(requireContext(), typeItems)
+                layoutParams = LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.WRAP_CONTENT
+                ).also {
+                    it.setMargins(0, 20, 0, 20)
+                }
+                foregroundGravity = Gravity.CENTER_HORIZONTAL
+                tag = type
+                minimumWidth = 1000
+                setOnTouchListener { _, _ -> true }
+            }
+
+            outfitLinearLayout.addView(recyclerView)
+        }
+    }
+
     fun generateOutfit() {
         if (selectedTypes.isEmpty()) {
             Toast.makeText(requireContext(), "Please select at least one clothing type", Toast.LENGTH_SHORT).show()
@@ -178,58 +210,45 @@ class CreateFragment : Fragment() {
         displayOutfit(outfit)
     }
 
-    fun displayOutfit(outfit: MutableMap<String, ClothingItem>) {
-        outfitLinearLayout.removeAllViews()
-
+    private fun displayOutfit(outfit: MutableMap<String, ClothingItem>) {
         val itemTypes = ClothingCategoriesManager.getAllTypes()
-
         val sortedOutfit = outfit.toSortedMap(compareBy { itemTypes.indexOf(it) })
 
         for (type in itemTypes) {
-            val itemImageView = ImageView(requireContext())
-            val itemImageViewLayoutParams = LinearLayout.LayoutParams(
-                350,
-                350
-            ).also { itemImageView.layoutParams = it }
-            itemImageViewLayoutParams.setMargins(0, 0, 0, 10)
-            itemImageViewLayoutParams.gravity = Gravity.CENTER
-
-            if (selectedTypes.contains(type) && sortedOutfit.containsKey(type)) {
-                val item = sortedOutfit[type]
-                itemImageView.setImageBitmap(ClothingItemsManager.getImage(requireContext(), item?.imageName as String))
-                itemImageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
-                outfitLinearLayout.addView(itemImageView)
-            } else {
-                if (selectedTypes.contains(type)) {
-                    val addButton = Button(requireContext())
-                    val addButtonLayoutParams = LayoutParams(
-                        LayoutParams.WRAP_CONTENT,
-                        LayoutParams.WRAP_CONTENT
-                    ).also { addButton.layoutParams = it }
-                    addButtonLayoutParams.setMargins(0, 20, 0, 20)
-                    addButton.text = "Add piece"
-                    addButton.setOnClickListener {
-                        Toast.makeText(requireContext(), "Dodaj element dla $type", Toast.LENGTH_SHORT).show()
+            val recyclerView = outfitLinearLayout.findViewWithTag<RecyclerView>(type)
+            if(sortedOutfit.containsKey(type)){
+                recyclerView.visibility = View.VISIBLE
+            }else{
+                recyclerView.visibility = View.GONE
+            }
+            Log.d("CreateFragment", "ok")
+            Log.d("CreateFragment", "rv - ${recyclerView}")
+            recyclerView?.let {
+                val adapter = recyclerView.adapter as? StylingItemsAdapter ?: return@let
+                val outfitItem = sortedOutfit[type]
+                if (outfitItem != null) {
+                    val index = adapter.getItems().indexOf(outfitItem)
+                    Log.d("CreateFragment", "ok")
+                    for(item in adapter.getItems()){
+                        Log.d("CreateFragment", "${item.imageName}")
                     }
-                    outfitLinearLayout.addView(addButton)
+                    if (index != -1) {
+                        val recyclerViewWidth = recyclerView.width
+                        val childWidth = recyclerView.getChildAt(0)?.width ?: 0
+                        val padding = (recyclerViewWidth - childWidth) / 2
+                        (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(index, padding)
+                    }
                 }
             }
         }
 
-        val newOutfit = Outfit(
-            id = OutfitManager.generateId(),
-            items = outfit.values.toList()
+        // Update save button icon based on whether the outfit exists or not
+        val newOutfit = Outfit(id = OutfitManager.generateId(), items = outfit.values.toList())
+        saveButton.setImageResource(
+            if (OutfitManager.outfitExists(newOutfit)) R.drawable.baseline_favorite_24
+            else R.drawable.baseline_favorite_border_24
         )
-
-        val outfitExists = OutfitManager.outfitExists(newOutfit)
-
-        if (outfitExists) {
-            saveButton.setImageResource(R.drawable.baseline_favorite_24)
-        } else {
-            saveButton.setImageResource(R.drawable.baseline_favorite_border_24)
-        }
     }
-
 
 
     private fun saveOutfit(outfit: MutableMap<String, ClothingItem>){
