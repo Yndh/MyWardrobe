@@ -2,19 +2,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:id="@+id/outfitItemLinearLayout"
+    android:paddingLeft="20dp"
+    >
 
     <ImageView
         android:id="@+id/clothingItemImageView"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:scaleType="centerCrop"
-        android:src="@color/background" />
-    <ImageView
-        android:id="@+id/lockedItemImageView"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/baseline_push_pin_24" />
+        android:src="@color/background"
+        android:layout_marginTop="10dp"
+        />
 
+    <ImageView
+        android:id="@+id/pinImageView"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:scaleType="centerCrop"
+        android:padding="3dp"
+        android:src="@color/background"
+        android:background="@color/background"
+        android:layout_marginLeft="5dp"
+        android:layout_marginBottom="5dp"
+        />
 </LinearLayout>

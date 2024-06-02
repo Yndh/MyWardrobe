@@ -1,28 +1,23 @@
 package com.example.mywardrobe.ui.fragments
 
 
+import StylingItemsAdapter
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.HorizontalScrollView
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.LinearLayout.LayoutParams
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
-import androidx.core.content.ContextCompat
-import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mywardrobe.R
-import com.example.mywardrobe.adapters.StylingItemsAdapter
 import com.example.mywardrobe.managers.ClothingItem
 import com.example.mywardrobe.managers.ClothingItemsManager
 import com.example.mywardrobe.managers.ClothingCategoriesManager
@@ -34,24 +29,28 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+data class OutfitClothingItem(
+    val item: ClothingItem,
+    var isLocked: Boolean = false
+)
+
 class CreateFragment : Fragment() {
 
-    lateinit var generateButton: ImageButton
-    lateinit var saveButton: ImageButton
-    lateinit var filtersImageButton: ImageButton
+    private lateinit var generateButton: ImageButton
+    private lateinit var saveButton: ImageButton
+    private lateinit var filtersImageButton: ImageButton
     private lateinit var outfitLinearLayout: LinearLayout
-    private lateinit var outfit: MutableMap<String, ClothingItem>
+    private lateinit var outfitRecyclerView: RecyclerView
 
     private var bottomSheetDialog: BottomSheetDialog? = null
 
+    private lateinit var outfit: MutableMap<String, OutfitClothingItem>
     private lateinit var selectedTypes: MutableList<String>
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_create, container, false)
     }
 
@@ -62,20 +61,34 @@ class CreateFragment : Fragment() {
         saveButton = view.findViewById(R.id.saveButton)
         filtersImageButton = view.findViewById(R.id.filtersImageButton)
         outfitLinearLayout = view.findViewById(R.id.outfitLinearLayout)
+        outfitRecyclerView = view.findViewById(R.id.outfitRecyclerView)
 
         outfit = mutableMapOf()
         selectedTypes = mutableListOf("Tops", "Bottoms", "Footwear")
 
-        populateRecyclerViews()
-
         val selectedOutfitJson = arguments?.getString("outfit")
-        if(selectedOutfitJson != null){
+        if (selectedOutfitJson != null) {
             val selectedOutfit = Gson().fromJson(selectedOutfitJson, Outfit::class.java)
-            outfit = selectedOutfit.items.associateBy { it.type }.toMutableMap()
+            for (item in selectedOutfit.items) {
+                if (!selectedTypes.contains(item.type)) {
+                    selectedTypes.add(item.type)
+                }
+            }
+            outfit = selectedOutfit.items.associateBy { it.type }
+                .mapValues { OutfitClothingItem(it.value) }.toMutableMap()
             displayOutfit(outfit)
             saveButton.setImageResource(R.drawable.baseline_favorite_24)
-        }else {
+        } else {
             generateOutfit()
+        }
+        val lockedItemJson = arguments?.getString("LockedItem")
+        if (lockedItemJson != null) {
+            val lockedItem = Gson().fromJson(lockedItemJson, ClothingItem::class.java)
+            outfit[lockedItem.type] = OutfitClothingItem(lockedItem, isLocked = true)
+            generateOutfit()
+            if (!selectedTypes.contains(lockedItem.type)) {
+                selectedTypes.add(lockedItem.type)
+            }
         }
 
         generateButton.setOnClickListener {
@@ -91,8 +104,8 @@ class CreateFragment : Fragment() {
         }
     }
 
-    fun openModal(){
-        if(bottomSheetDialog != null && bottomSheetDialog!!.isShowing){
+    fun openModal() {
+        if (bottomSheetDialog != null && bottomSheetDialog!!.isShowing) {
             return
         }
 
@@ -116,25 +129,25 @@ class CreateFragment : Fragment() {
 
         val newSelectedTypes = selectedTypes
 
-        for(type in types){
+        for (type in types) {
             val categoryView = inflater.inflate(R.layout.grid_item_category, typesFilterLinearLayout, false)
             val categoryTextView: TextView = categoryView.findViewById(R.id.categoryTextView)
             categoryTextView.text = type
             val typeImage: ImageView = categoryView.findViewById(R.id.categoryImage)
-            if(newSelectedTypes.contains(type)){
+            if (newSelectedTypes.contains(type)) {
                 typeImage.setBackgroundResource(R.drawable.category_selector_checked)
                 categoryView.isSelected = true
-                if(!newSelectedTypes.contains(type)){
+                if (!newSelectedTypes.contains(type)) {
                     newSelectedTypes.add(type)
                 }
             }
 
             categoryView.setOnClickListener {
-                if(categoryView.isSelected){
+                if (categoryView.isSelected) {
                     newSelectedTypes.remove(type)
                     typeImage.setBackgroundResource(R.drawable.category_selector)
                 } else {
-                    if(!newSelectedTypes.contains(type)){
+                    if (!newSelectedTypes.contains(type)) {
                         newSelectedTypes.add(type)
                     }
                     typeImage.setBackgroundResource(R.drawable.category_selector_checked)
@@ -146,41 +159,23 @@ class CreateFragment : Fragment() {
         }
 
         applyChanges.setOnClickListener {
-            selectedTypes = newSelectedTypes
+            val typesToRemove = types.filter { !newSelectedTypes.contains(it) }
+
+            selectedTypes = selectedTypes.filter { type ->
+                !typesToRemove.contains(type)
+            }.toMutableList()
+
+            outfit = outfit.filter { (type, _) ->
+                !typesToRemove.contains(type)
+            }.toMutableMap()
+
             bottomSheetDialog?.dismiss()
             generateOutfit()
         }
 
+
         closeFilterDialog.setOnClickListener {
             bottomSheetDialog?.dismiss()
-        }
-
-
-    }
-
-    private fun populateRecyclerViews() {
-        val itemTypes = ClothingCategoriesManager.getAllTypes()
-        val clothingItems = ClothingItemsManager.getClothingItems()
-
-        for (type in itemTypes) {
-            val typeItems = clothingItems.filter { it.type == type }
-
-            val recyclerView = RecyclerView(requireContext()).apply {
-                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-                adapter = StylingItemsAdapter(requireContext(), typeItems)
-                layoutParams = LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT
-                ).also {
-                    it.setMargins(0, 20, 0, 20)
-                }
-                foregroundGravity = Gravity.CENTER_HORIZONTAL
-                tag = type
-                minimumWidth = 1000
-                setOnTouchListener { _, _ -> true }
-            }
-
-            outfitLinearLayout.addView(recyclerView)
         }
     }
 
@@ -194,81 +189,59 @@ class CreateFragment : Fragment() {
 
         val filteredItems = clothingItems.filter { selectedTypes.contains(it.type) }
 
-        outfit = mutableMapOf()
+        val newOutfit = mutableMapOf<String, OutfitClothingItem>()
+        for ((type, item) in outfit) {
+            if (item.isLocked) {
+                newOutfit[type] = item
+            }
+        }
+
         for (type in selectedTypes) {
-            val typeItems = filteredItems.filter { it.type == type }
-            if (typeItems.isNotEmpty()) {
-                outfit[type] = typeItems.random()
-            }
-        }
-
-        if (outfit.size < selectedTypes.size) {
-            displayOutfit(outfit)
-            return
-        }
-
-        displayOutfit(outfit)
-    }
-
-    private fun displayOutfit(outfit: MutableMap<String, ClothingItem>) {
-        val itemTypes = ClothingCategoriesManager.getAllTypes()
-        val sortedOutfit = outfit.toSortedMap(compareBy { itemTypes.indexOf(it) })
-
-        for (type in itemTypes) {
-            val recyclerView = outfitLinearLayout.findViewWithTag<RecyclerView>(type)
-            if(sortedOutfit.containsKey(type)){
-                recyclerView.visibility = View.VISIBLE
-            }else{
-                recyclerView.visibility = View.GONE
-            }
-            Log.d("CreateFragment", "ok")
-            Log.d("CreateFragment", "rv - ${recyclerView}")
-            recyclerView?.let {
-                val adapter = recyclerView.adapter as? StylingItemsAdapter ?: return@let
-                val outfitItem = sortedOutfit[type]
-                if (outfitItem != null) {
-                    val index = adapter.getItems().indexOf(outfitItem)
-                    Log.d("CreateFragment", "ok")
-                    for(item in adapter.getItems()){
-                        Log.d("CreateFragment", "${item.imageName}")
-                    }
-                    if (index != -1) {
-                        val recyclerViewWidth = recyclerView.width
-                        val childWidth = recyclerView.getChildAt(0)?.width ?: 0
-                        val padding = (recyclerViewWidth - childWidth) / 2
-                        (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(index, padding)
-                    }
+            if (!newOutfit.containsKey(type)) {
+                val typeItems = filteredItems.filter { it.type == type }
+                if (typeItems.isNotEmpty()) {
+                    newOutfit[type] = OutfitClothingItem(typeItems.random())
                 }
             }
         }
 
-        // Update save button icon based on whether the outfit exists or not
-        val newOutfit = Outfit(id = OutfitManager.generateId(), items = outfit.values.toList())
+        outfit = newOutfit
+
+        displayOutfit(outfit)
+    }
+
+    private fun displayOutfit(outfit: MutableMap<String, OutfitClothingItem>) {
+        val itemTypes = ClothingCategoriesManager.getAllTypes()
+        val sortedOutfit = itemTypes.mapNotNull { outfit[it] }
+
+        outfitRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        outfitRecyclerView.adapter = StylingItemsAdapter(requireContext(), sortedOutfit)
+
+        val newOutfit = Outfit(id = OutfitManager.generateId(), items = outfit.values.map { it.item })
         saveButton.setImageResource(
             if (OutfitManager.outfitExists(newOutfit)) R.drawable.baseline_favorite_24
             else R.drawable.baseline_favorite_border_24
         )
     }
 
-
-    private fun saveOutfit(outfit: MutableMap<String, ClothingItem>){
+    private fun saveOutfit(outfit: MutableMap<String, OutfitClothingItem>) {
         val newOutfit = Outfit(
             id = OutfitManager.generateId(),
-            items = outfit.values.toList()
+            items = outfit.values.map { it.item }
         )
 
         val outfitExists = OutfitManager.outfitExists(newOutfit)
 
-        if(outfitExists){
+        if (outfitExists) {
             OutfitManager.removeOutfit(newOutfit)
-        }else{
+        } else {
             OutfitManager.addOutfit(newOutfit)
         }
         val outfits = OutfitManager.getOutfits()
 
         GlobalScope.launch(Dispatchers.Main) {
             val dataResult = OutfitManager.saveOutfits(requireContext(), outfits)
-            if(dataResult){
+            if (dataResult) {
                 Log.d("CreateFragment", "Outfit file saved")
                 if (outfitExists) {
                     saveButton.setImageResource(R.drawable.baseline_favorite_border_24)
@@ -281,7 +254,5 @@ class CreateFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failed to save item", Toast.LENGTH_SHORT).show()
             }
         }
-
     }
-
 }

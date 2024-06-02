@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
 
         if(savedInstanceState==null){
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentFrame, HomeFragment())
+                .replace(R.id.fragmentFrame, WardrobeFragment())
                 .commit()
         }
     }
@@ -103,10 +103,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun replaceFragment(fragment: Fragment) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
-//        fragmentTransaction.setCustomAnimations(
-//            R.anim.slide_in,
-//            R.anim.slide_out
-//        )
 
         fragmentTransaction
             .replace(R.id.fragmentFrame, fragment)

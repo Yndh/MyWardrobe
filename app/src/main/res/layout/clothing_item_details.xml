@@ -111,5 +111,15 @@
                 </LinearLayout>
             </HorizontalScrollView>
         </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/generateOutfitButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Generate Outfit"
+            android:textAllCaps="false"
+            android:background="@drawable/rounded_border"
+            android:textColor="@color/fontSecondary"
+            />
     </LinearLayout>
 </LinearLayout>

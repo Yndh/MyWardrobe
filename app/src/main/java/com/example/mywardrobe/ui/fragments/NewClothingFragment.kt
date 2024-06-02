@@ -84,7 +84,7 @@ class NewClothingFragment : Fragment() {
 
         pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
-                Log.d("PhotoPicker", "Selected URI: $uri")
+                Log.d("NewClothingFragment", "Selected URI: $uri")
                 clothingImage.setImageURI(uri)
                 clothingImage.setPadding(0)
                 clothingImage.scaleType = ImageView.ScaleType.CENTER_INSIDE

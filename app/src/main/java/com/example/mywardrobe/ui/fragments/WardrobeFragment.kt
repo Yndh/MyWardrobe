@@ -12,6 +12,7 @@ import android.widget.RadioGroup
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -24,10 +25,7 @@ import com.example.mywardrobe.managers.ClothingItemsManager
 import com.example.mywardrobe.managers.ClothingCategoriesManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.google.gson.Gson
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -233,6 +231,7 @@ class WardrobeFragment : Fragment() {
         val categoriesLinearLayout: LinearLayout = view.findViewById(R.id.categoriesLinearLayout)
         val errorTextView: TextView = view.findViewById(R.id.errorTextView)
         val closeDialog: ImageButton = view.findViewById(R.id.closeDialog)
+        val generateOutfitButton: AppCompatButton = view.findViewById(R.id.generateOutfitButton)
 
         clothingItemImageView.setImageBitmap(ClothingItemsManager.getImage(requireContext(), item.imageName))
 
@@ -249,6 +248,23 @@ class WardrobeFragment : Fragment() {
             }
         } else {
             errorTextView.visibility = View.VISIBLE
+        }
+
+        generateOutfitButton.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("LockedItem", Gson().toJson(item))
+            }
+
+            val createFragment = CreateFragment().apply {
+                arguments = bundle
+            }
+
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentFrame, createFragment)
+                .addToBackStack(null)
+                .commit()
+
+            bottomSheetDialog?.dismiss()
         }
 
         closeDialog.setOnClickListener {
